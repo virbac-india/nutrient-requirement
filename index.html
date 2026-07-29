@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Broiler Nutrient Deficit Diagnostic System</title>
+  <title>Nutrient Requirement Diagnostic System</title>
   <style>
     :root {
       --primary: #1e3a8a;
@@ -124,12 +124,11 @@
 
 <div class="container">
   <div class="card">
-    <h2>🐔 Broiler Deficit Diagnostics</h2>
-    <p style="font-size:13px; color:#64748b; margin-bottom:12px;">Standard baseline synced with Ross/NRC guidelines.</p>
+    <h2>🐔 Nutrient Requirement</h2>
+    <p style="font-size:13px; color:#64748b; margin-bottom:12px;">Standard baseline synced with NRC guidelines.</p>
     
     <label for="age">Bird Age / Phase Stage:</label>
     <select id="age">
-      <option value="1">Day 1</option>
       <option value="7" selected>Day 7 (Week I)</option>
       <option value="14">Day 14 (Week II)</option>
       <option value="21">Day 21 (Week III)</option>
@@ -191,16 +190,72 @@
 </div>
 
 <script>
+  // Standard dataset updated from official NRC reference chart
   const stdData = {
-    '1': {bw: 61, fcr: 0.24, phase: 'Starter'},
-    '7': {bw: 190, fcr: 0.95, phase: 'Starter'},
-    '14': {bw: 450, fcr: 1.20, phase: 'Starter'},
-    '21': {bw: 850, fcr: 1.31, phase: 'Starter'},
-    '28': {bw: 1400, fcr: 1.41, phase: 'Grower'},
-    '35': {bw: 1980, fcr: 1.54, phase: 'Grower'},
-    '42': {bw: 2620, fcr: 1.68, phase: 'Grower'},
-    '49': {bw: 3360, fcr: 1.78, phase: 'Finisher'},
-    '56': {bw: 4210, fcr: 1.81, phase: 'Finisher'}
+    '1': {bw: 92, fcr: 0.24, phase: 'Starter'},
+    '2': {bw: 115, fcr: 0.40, phase: 'Starter'},
+    '3': {bw: 135, fcr: 0.53, phase: 'Starter'},
+    '4': {bw: 158, fcr: 0.64, phase: 'Starter'},
+    '5': {bw: 178, fcr: 0.75, phase: 'Starter'},
+    '6': {bw: 201, fcr: 0.85, phase: 'Starter'},
+    '7': {bw: 221, fcr: 0.95, phase: 'Starter'},
+    'Week I': {bw: 221, fcr: 0.95, phase: 'Starter'},
+    '8': {bw: 264, fcr: 0.97, phase: 'Starter'},
+    '9': {bw: 301, fcr: 1.00, phase: 'Starter'},
+    '10': {bw: 338, fcr: 1.03, phase: 'Starter'},
+    '11': {bw: 377, fcr: 1.07, phase: 'Starter'},
+    '12': {bw: 413, fcr: 1.11, phase: 'Starter'},
+    '13': {bw: 450, fcr: 1.16, phase: 'Starter'},
+    '14': {bw: 487, fcr: 1.20, phase: 'Starter'},
+    'Week II': {bw: 487, fcr: 1.20, phase: 'Starter'},
+    '15': {bw: 564, fcr: 1.20, phase: 'Starter'},
+    '16': {bw: 621, fcr: 1.21, phase: 'Starter'},
+    '17': {bw: 678, fcr: 1.23, phase: 'Starter'},
+    '18': {bw: 737, fcr: 1.24, phase: 'Starter'},
+    '19': {bw: 793, fcr: 1.26, phase: 'Starter'},
+    '20': {bw: 850, fcr: 1.29, phase: 'Starter'},
+    '21': {bw: 907, fcr: 1.31, phase: 'Starter'},
+    'Week III': {bw: 907, fcr: 1.31, phase: 'Starter'},
+    '22': {bw: 1008, fcr: 1.31, phase: 'Grower'},
+    '23': {bw: 1085, fcr: 1.32, phase: 'Grower'},
+    '24': {bw: 1165, fcr: 1.33, phase: 'Grower'},
+    '25': {bw: 1242, fcr: 1.35, phase: 'Grower'},
+    '26': {bw: 1322, fcr: 1.37, phase: 'Grower'},
+    '27': {bw: 1399, fcr: 1.39, phase: 'Grower'},
+    '28': {bw: 1479, fcr: 1.41, phase: 'Grower'},
+    'Week IV': {bw: 1479, fcr: 1.41, phase: 'Grower'},
+    '29': {bw: 1566, fcr: 1.43, phase: 'Grower'},
+    '30': {bw: 1649, fcr: 1.45, phase: 'Grower'},
+    '31': {bw: 1732, fcr: 1.47, phase: 'Grower'},
+    '32': {bw: 1813, fcr: 1.48, phase: 'Grower'},
+    '33': {bw: 1897, fcr: 1.50, phase: 'Grower'},
+    '34': {bw: 1980, fcr: 1.52, phase: 'Grower'},
+    '35': {bw: 2063, fcr: 1.54, phase: 'Grower'},
+    'Week V': {bw: 2063, fcr: 1.54, phase: 'Grower'},
+    '36': {bw: 2162, fcr: 1.56, phase: 'Grower'},
+    '37': {bw: 2255, fcr: 1.57, phase: 'Grower'},
+    '38': {bw: 2345, fcr: 1.59, phase: 'Grower'},
+    '39': {bw: 2438, fcr: 1.61, phase: 'Grower'},
+    '40': {bw: 2528, fcr: 1.63, phase: 'Grower'},
+    '41': {bw: 2621, fcr: 1.66, phase: 'Grower'},
+    '42': {bw: 2711, fcr: 1.68, phase: 'Grower'},
+    'Week VI': {bw: 2711, fcr: 1.68, phase: 'Grower'},
+    '43': {bw: 2832, fcr: 1.70, phase: 'Finisher'},
+    '44': {bw: 2936, fcr: 1.71, phase: 'Finisher'},
+    '45': {bw: 3043, fcr: 1.73, phase: 'Finisher'},
+    '46': {bw: 3149, fcr: 1.74, phase: 'Finisher'},
+    '47': {bw: 3255, fcr: 1.75, phase: 'Finisher'},
+    '48': {bw: 3359, fcr: 1.77, phase: 'Finisher'},
+    '49': {bw: 3466, fcr: 1.78, phase: 'Finisher'},
+    'Week VII': {bw: 3466, fcr: 1.78, phase: 'Finisher'},
+    '50': {bw: 3602, fcr: 1.78, phase: 'Finisher'},
+    '51': {bw: 3725, fcr: 1.79, phase: 'Finisher'},
+    '52': {bw: 3845, fcr: 1.79, phase: 'Finisher'},
+    '53': {bw: 3968, fcr: 1.80, phase: 'Finisher'},
+    '54': {bw: 4088, fcr: 1.80, phase: 'Finisher'},
+    '55': {bw: 4211, fcr: 1.81, phase: 'Finisher'},
+    '56': {bw: 4331, fcr: 1.81, phase: 'Finisher'},
+    'Week VIII': {bw: 4331, fcr: 1.81, phase: 'Finisher'}
   };
 
   const nutrients = [
