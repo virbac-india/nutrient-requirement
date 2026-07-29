@@ -62,6 +62,20 @@
     button:hover {
       background-color: #047857;
     }
+    .stage-badge-container {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .badge {
+      background: #e2e8f0;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #334155;
+    }
     .metrics-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -125,22 +139,28 @@
 <div class="container">
   <div class="card">
     <h2>🐔 Nutrient Requirement</h2>
-    <p style="font-size:13px; color:#64748b; margin-bottom:12px;">Standard baseline synced with NRC guidelines.</p>
+    <p style="font-size:13px; color:#64748b; margin-bottom:8px;">Standard baseline synced with NRC guidelines.</p>
     
-    <label for="age">Bird Age / Phase Stage:</label>
+    <div class="stage-badge-container">
+      <div class="badge">🌱 Starter (Day 0–14): 22%–25% CP</div>
+      <div class="badge">🌾 Grower (Day 15–24): 20%–22% CP</div>
+      <div class="badge">🐓 Finisher (Day 25+): 18%–20% CP</div>
+    </div>
+    
+    <label for="age">Bird Age / Stage Selection:</label>
     <select id="age">
-      <option value="7" selected>Day 7 (Week I)</option>
-      <option value="14">Day 14 (Week II)</option>
-      <option value="21">Day 21 (Week III)</option>
-      <option value="28">Day 28 (Week IV)</option>
-      <option value="35">Day 35 (Week V)</option>
-      <option value="42">Day 42 (Week VI)</option>
-      <option value="49">Day 49 (Week VII)</option>
-      <option value="56">Day 56 (Week VIII)</option>
+      <option value="7" selected>Day 7 (Week I - Starter Phase)</option>
+      <option value="14">Day 14 (Week II - Starter Phase)</option>
+      <option value="21">Day 21 (Week III - Grower Phase)</option>
+      <option value="28">Day 28 (Week IV - Finisher Phase)</option>
+      <option value="35">Day 35 (Week V - Finisher Phase)</option>
+      <option value="42">Day 42 (Week VI - Finisher Phase)</option>
+      <option value="49">Day 49 (Week VII - Finisher Phase)</option>
+      <option value="56">Day 56 (Week VIII - Finisher Phase)</option>
     </select>
 
     <label for="actualBW">Observed Average Weight (grams / bird):</label>
-    <input type="number" id="actualBW" value="170" step="1">
+    <input type="number" id="actualBW" value="180" step="1">
 
     <label for="flockSize">Total Flock Size (Number of Birds):</label>
     <input type="number" id="flockSize" value="10000" step="500">
@@ -149,7 +169,7 @@
   </div>
 
   <div class="card" id="results" style="display:none;">
-    <h3>📊 Diagnostic Summary</h3>
+    <h3>📊 Diagnostic Summary (<span id="phaseDisplay"></span>)</h3>
     
     <div class="metrics-grid">
       <div class="metric-box">
@@ -190,7 +210,8 @@
 </div>
 
 <script>
-  // Standard dataset updated from official NRC reference chart
+  // Updated Dataset: Stage mapping & Body Weight baselines
+  // Starter: Day 1 to 14 | Grower: Day 15 to 24 | Finisher: Day 25 to Market
   const stdData = {
     '1': {bw: 92, fcr: 0.24, phase: 'Starter'},
     '2': {bw: 115, fcr: 0.40, phase: 'Starter'},
@@ -208,38 +229,38 @@
     '13': {bw: 450, fcr: 1.16, phase: 'Starter'},
     '14': {bw: 487, fcr: 1.20, phase: 'Starter'},
     'Week II': {bw: 487, fcr: 1.20, phase: 'Starter'},
-    '15': {bw: 564, fcr: 1.20, phase: 'Starter'},
-    '16': {bw: 621, fcr: 1.21, phase: 'Starter'},
-    '17': {bw: 678, fcr: 1.23, phase: 'Starter'},
-    '18': {bw: 737, fcr: 1.24, phase: 'Starter'},
-    '19': {bw: 793, fcr: 1.26, phase: 'Starter'},
-    '20': {bw: 850, fcr: 1.29, phase: 'Starter'},
-    '21': {bw: 907, fcr: 1.31, phase: 'Starter'},
-    'Week III': {bw: 907, fcr: 1.31, phase: 'Starter'},
+    '15': {bw: 564, fcr: 1.20, phase: 'Grower'},
+    '16': {bw: 621, fcr: 1.21, phase: 'Grower'},
+    '17': {bw: 678, fcr: 1.23, phase: 'Grower'},
+    '18': {bw: 737, fcr: 1.24, phase: 'Grower'},
+    '19': {bw: 793, fcr: 1.26, phase: 'Grower'},
+    '20': {bw: 850, fcr: 1.29, phase: 'Grower'},
+    '21': {bw: 907, fcr: 1.31, phase: 'Grower'},
+    'Week III': {bw: 907, fcr: 1.31, phase: 'Grower'},
     '22': {bw: 1008, fcr: 1.31, phase: 'Grower'},
     '23': {bw: 1085, fcr: 1.32, phase: 'Grower'},
     '24': {bw: 1165, fcr: 1.33, phase: 'Grower'},
-    '25': {bw: 1242, fcr: 1.35, phase: 'Grower'},
-    '26': {bw: 1322, fcr: 1.37, phase: 'Grower'},
-    '27': {bw: 1399, fcr: 1.39, phase: 'Grower'},
-    '28': {bw: 1479, fcr: 1.41, phase: 'Grower'},
-    'Week IV': {bw: 1479, fcr: 1.41, phase: 'Grower'},
-    '29': {bw: 1566, fcr: 1.43, phase: 'Grower'},
-    '30': {bw: 1649, fcr: 1.45, phase: 'Grower'},
-    '31': {bw: 1732, fcr: 1.47, phase: 'Grower'},
-    '32': {bw: 1813, fcr: 1.48, phase: 'Grower'},
-    '33': {bw: 1897, fcr: 1.50, phase: 'Grower'},
-    '34': {bw: 1980, fcr: 1.52, phase: 'Grower'},
-    '35': {bw: 2063, fcr: 1.54, phase: 'Grower'},
-    'Week V': {bw: 2063, fcr: 1.54, phase: 'Grower'},
-    '36': {bw: 2162, fcr: 1.56, phase: 'Grower'},
-    '37': {bw: 2255, fcr: 1.57, phase: 'Grower'},
-    '38': {bw: 2345, fcr: 1.59, phase: 'Grower'},
-    '39': {bw: 2438, fcr: 1.61, phase: 'Grower'},
-    '40': {bw: 2528, fcr: 1.63, phase: 'Grower'},
-    '41': {bw: 2621, fcr: 1.66, phase: 'Grower'},
-    '42': {bw: 2711, fcr: 1.68, phase: 'Grower'},
-    'Week VI': {bw: 2711, fcr: 1.68, phase: 'Grower'},
+    '25': {bw: 1242, fcr: 1.35, phase: 'Finisher'},
+    '26': {bw: 1322, fcr: 1.37, phase: 'Finisher'},
+    '27': {bw: 1399, fcr: 1.39, phase: 'Finisher'},
+    '28': {bw: 1479, fcr: 1.41, phase: 'Finisher'},
+    'Week IV': {bw: 1479, fcr: 1.41, phase: 'Finisher'},
+    '29': {bw: 1566, fcr: 1.43, phase: 'Finisher'},
+    '30': {bw: 1649, fcr: 1.45, phase: 'Finisher'},
+    '31': {bw: 1732, fcr: 1.47, phase: 'Finisher'},
+    '32': {bw: 1813, fcr: 1.48, phase: 'Finisher'},
+    '33': {bw: 1897, fcr: 1.50, phase: 'Finisher'},
+    '34': {bw: 1980, fcr: 1.52, phase: 'Finisher'},
+    '35': {bw: 2063, fcr: 1.54, phase: 'Finisher'},
+    'Week V': {bw: 2063, fcr: 1.54, phase: 'Finisher'},
+    '36': {bw: 2162, fcr: 1.56, phase: 'Finisher'},
+    '37': {bw: 2255, fcr: 1.57, phase: 'Finisher'},
+    '38': {bw: 2345, fcr: 1.59, phase: 'Finisher'},
+    '39': {bw: 2438, fcr: 1.61, phase: 'Finisher'},
+    '40': {bw: 2528, fcr: 1.63, phase: 'Finisher'},
+    '41': {bw: 2621, fcr: 1.66, phase: 'Finisher'},
+    '42': {bw: 2711, fcr: 1.68, phase: 'Finisher'},
+    'Week VI': {bw: 2711, fcr: 1.68, phase: 'Finisher'},
     '43': {bw: 2832, fcr: 1.70, phase: 'Finisher'},
     '44': {bw: 2936, fcr: 1.71, phase: 'Finisher'},
     '45': {bw: 3043, fcr: 1.73, phase: 'Finisher'},
@@ -258,8 +279,10 @@
     'Week VIII': {bw: 4331, fcr: 1.81, phase: 'Finisher'}
   };
 
+  // Updated Nutrient Table incorporating Crude Protein targets
+  // Starter: 23.0% (22-25%) | Grower: 21.0% (20-22%) | Finisher: 19.0% (18-20%)
   const nutrients = [
-    {name: "Crude protein", unit: "%", Starter: 23.0, Grower: 20.0, Finisher: 18.0},
+    {name: "Crude protein", unit: "%", Starter: 23.0, Grower: 21.0, Finisher: 19.0},
     {name: "Arginine", unit: "%", Starter: 1.25, Grower: 1.10, Finisher: 1.00},
     {name: "Glycine + serine", unit: "%", Starter: 1.25, Grower: 1.14, Finisher: 0.97},
     {name: "Lysine", unit: "%", Starter: 1.10, Grower: 1.00, Finisher: 0.85},
@@ -292,6 +315,7 @@
     const flockExtraFeedKg = (catchupFeedGrams * flockSize) / 1000;
 
     document.getElementById('results').style.display = 'block';
+    document.getElementById('phaseDisplay').innerText = phase + ' Phase Stage';
     document.getElementById('stdBWDisplay').innerText = stdBW + ' g';
     document.getElementById('actBWDisplay').innerText = actualBW + ' g';
     document.getElementById('bwDefDisplay').innerText = bwDeficit.toFixed(1) + ' g';
@@ -300,7 +324,7 @@
     const alertBox = document.getElementById('alertBox');
     if (bwDeficit > 0) {
       alertBox.style.display = 'block';
-      alertBox.innerHTML = `⚠️ Flock is <b>${bwDeficit.toFixed(1)} g underweight</b>. Extra feed needed across ${flockSize.toLocaleString()} birds to recover target weight: <b>${flockExtraFeedKg.toFixed(2)} kg</b>.`;
+      alertBox.innerHTML = `⚠️ Flock is <b>${bwDeficit.toFixed(1)} g underweight</b> in the <b>${phase} stage</b>. Additional balanced feed required across ${flockSize.toLocaleString()} birds: <b>${flockExtraFeedKg.toFixed(2)} kg</b>.`;
     } else {
       alertBox.style.display = 'none';
     }
