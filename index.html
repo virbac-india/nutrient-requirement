@@ -46,6 +46,7 @@
       color: var(--primary);
       margin: 20px 0 4px 0;
       letter-spacing: -0.5px;
+      text-align: center;
     }
     h2, h3, h4 {
       margin-top: 0;
@@ -232,7 +233,6 @@
             <th>Category / Nutrient</th>
             <th>Diet Requirement</th>
             <th>Deficit / Bird</th>
-            <th>Flock Deficit Total</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -398,22 +398,14 @@
     nutrients.forEach(n => {
       const req = n[phaseKey];
       let defBird = 0;
-      let defFlock = 0;
-      let dispUnit = n.unit; // Strictly match the requirement unit tag (%)
-      let defFlockFormatted = '';
+      let dispUnit = n.unit;
 
       if (n.unit === '%') {
         defBird = (req / 100.0) * catchupFeedGrams;
-        defFlock = defBird * flockSize;
-        defFlockFormatted = defFlock.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' %';
       } else if (n.unit === 'mg') {
         defBird = (req / 1000.0) * catchupFeedGrams;
-        defFlock = defBird * flockSize;
-        defFlockFormatted = defFlock.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' mg';
       } else { // IU / ICU
         defBird = (req / 1000.0) * catchupFeedGrams;
-        defFlock = defBird * flockSize;
-        defFlockFormatted = defFlock.toLocaleString(undefined, {maximumFractionDigits: 0}) + ' ' + n.unit;
       }
 
       const tr = document.createElement('tr');
@@ -421,7 +413,6 @@
         <td><b>${n.name}</b></td>
         <td>${req} ${n.unit}${n.unit !== '%' ? '/kg' : ''}</td>
         <td>${defBird.toFixed(3)} ${dispUnit}</td>
-        <td><b>${defFlockFormatted}</b></td>
       `;
       tbody.appendChild(tr);
     });
