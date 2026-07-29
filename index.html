@@ -21,7 +21,7 @@
       padding: 12px;
     }
     .container {
-      max-width: 800px;
+      max-width: 850px;
       margin: 0 auto;
     }
     .card {
@@ -75,6 +75,10 @@
       font-size: 12px;
       font-weight: 600;
       color: #334155;
+    }
+    .badge.active {
+      background: #1e3a8a;
+      color: white;
     }
     .metrics-grid {
       display: grid;
@@ -139,24 +143,24 @@
 <div class="container">
   <div class="card">
     <h2>🐔 Nutrient Requirement</h2>
-    <p style="font-size:13px; color:#64748b; margin-bottom:8px;">Standard baseline synced with NRC guidelines.</p>
+    <p style="font-size:13px; color:#64748b; margin-bottom:12px;">Standard baseline synced with NRC guidelines.</p>
     
     <div class="stage-badge-container">
-      <div class="badge">🌱 Starter (Day 0–14): 22%–25% CP</div>
-      <div class="badge">🌾 Grower (Day 15–24): 20%–22% CP</div>
-      <div class="badge">🐓 Finisher (Day 25+): 18%–20% CP</div>
+      <div id="badge1" class="badge">0 to 3 Weeks (Starter)</div>
+      <div id="badge2" class="badge">3 to 6 Weeks (Grower)</div>
+      <div id="badge3" class="badge">6 to 8 Weeks (Finisher)</div>
     </div>
     
-    <label for="age">Bird Age / Stage Selection:</label>
-    <select id="age">
-      <option value="7" selected>Day 7 (Week I - Starter Phase)</option>
-      <option value="14">Day 14 (Week II - Starter Phase)</option>
-      <option value="21">Day 21 (Week III - Grower Phase)</option>
-      <option value="28">Day 28 (Week IV - Finisher Phase)</option>
-      <option value="35">Day 35 (Week V - Finisher Phase)</option>
-      <option value="42">Day 42 (Week VI - Finisher Phase)</option>
-      <option value="49">Day 49 (Week VII - Finisher Phase)</option>
-      <option value="56">Day 56 (Week VIII - Finisher Phase)</option>
+    <label for="age">Select Age / Week Stage:</label>
+    <select id="age" onchange="updateStageBadge()">
+      <option value="7" selected>Day 7 (Week I: 0 to 3 Weeks)</option>
+      <option value="14">Day 14 (Week II: 0 to 3 Weeks)</option>
+      <option value="21">Day 21 (Week III: 0 to 3 Weeks)</option>
+      <option value="28">Day 28 (Week IV: 3 to 6 Weeks)</option>
+      <option value="35">Day 35 (Week V: 3 to 6 Weeks)</option>
+      <option value="42">Day 42 (Week VI: 3 to 6 Weeks)</option>
+      <option value="49">Day 49 (Week VII: 6 to 8 Weeks)</option>
+      <option value="56">Day 56 (Week VIII: 6 to 8 Weeks)</option>
     </select>
 
     <label for="actualBW">Observed Average Weight (grams / bird):</label>
@@ -165,7 +169,7 @@
     <label for="flockSize">Total Flock Size (Number of Birds):</label>
     <input type="number" id="flockSize" value="10000" step="500">
 
-    <button onclick="calculate()">Calculate Deficit & Requirements</button>
+    <button onclick="calculate()">Calculate Deficit & Dynamic Requirements</button>
   </div>
 
   <div class="card" id="results" style="display:none;">
@@ -197,7 +201,7 @@
       <table id="nutrientTable">
         <thead>
           <tr>
-            <th>Nutrient</th>
+            <th>Category / Nutrient</th>
             <th>Diet Requirement</th>
             <th>Deficit / Bird</th>
             <th>Flock Deficit Total</th>
@@ -210,95 +214,128 @@
 </div>
 
 <script>
-  // Updated Dataset: Stage mapping & Body Weight baselines
-  // Starter: Day 1 to 14 | Grower: Day 15 to 24 | Finisher: Day 25 to Market
+  // Standard dataset mapped to the 3 NRC periods:
+  // w0_3: 0 to 3 Weeks | w3_6: 3 to 6 Weeks | w6_8: 6 to 8 Weeks
   const stdData = {
-    '1': {bw: 92, fcr: 0.24, phase: 'Starter'},
-    '2': {bw: 115, fcr: 0.40, phase: 'Starter'},
-    '3': {bw: 135, fcr: 0.53, phase: 'Starter'},
-    '4': {bw: 158, fcr: 0.64, phase: 'Starter'},
-    '5': {bw: 178, fcr: 0.75, phase: 'Starter'},
-    '6': {bw: 201, fcr: 0.85, phase: 'Starter'},
-    '7': {bw: 221, fcr: 0.95, phase: 'Starter'},
-    'Week I': {bw: 221, fcr: 0.95, phase: 'Starter'},
-    '8': {bw: 264, fcr: 0.97, phase: 'Starter'},
-    '9': {bw: 301, fcr: 1.00, phase: 'Starter'},
-    '10': {bw: 338, fcr: 1.03, phase: 'Starter'},
-    '11': {bw: 377, fcr: 1.07, phase: 'Starter'},
-    '12': {bw: 413, fcr: 1.11, phase: 'Starter'},
-    '13': {bw: 450, fcr: 1.16, phase: 'Starter'},
-    '14': {bw: 487, fcr: 1.20, phase: 'Starter'},
-    'Week II': {bw: 487, fcr: 1.20, phase: 'Starter'},
-    '15': {bw: 564, fcr: 1.20, phase: 'Grower'},
-    '16': {bw: 621, fcr: 1.21, phase: 'Grower'},
-    '17': {bw: 678, fcr: 1.23, phase: 'Grower'},
-    '18': {bw: 737, fcr: 1.24, phase: 'Grower'},
-    '19': {bw: 793, fcr: 1.26, phase: 'Grower'},
-    '20': {bw: 850, fcr: 1.29, phase: 'Grower'},
-    '21': {bw: 907, fcr: 1.31, phase: 'Grower'},
-    'Week III': {bw: 907, fcr: 1.31, phase: 'Grower'},
-    '22': {bw: 1008, fcr: 1.31, phase: 'Grower'},
-    '23': {bw: 1085, fcr: 1.32, phase: 'Grower'},
-    '24': {bw: 1165, fcr: 1.33, phase: 'Grower'},
-    '25': {bw: 1242, fcr: 1.35, phase: 'Finisher'},
-    '26': {bw: 1322, fcr: 1.37, phase: 'Finisher'},
-    '27': {bw: 1399, fcr: 1.39, phase: 'Finisher'},
-    '28': {bw: 1479, fcr: 1.41, phase: 'Finisher'},
-    'Week IV': {bw: 1479, fcr: 1.41, phase: 'Finisher'},
-    '29': {bw: 1566, fcr: 1.43, phase: 'Finisher'},
-    '30': {bw: 1649, fcr: 1.45, phase: 'Finisher'},
-    '31': {bw: 1732, fcr: 1.47, phase: 'Finisher'},
-    '32': {bw: 1813, fcr: 1.48, phase: 'Finisher'},
-    '33': {bw: 1897, fcr: 1.50, phase: 'Finisher'},
-    '34': {bw: 1980, fcr: 1.52, phase: 'Finisher'},
-    '35': {bw: 2063, fcr: 1.54, phase: 'Finisher'},
-    'Week V': {bw: 2063, fcr: 1.54, phase: 'Finisher'},
-    '36': {bw: 2162, fcr: 1.56, phase: 'Finisher'},
-    '37': {bw: 2255, fcr: 1.57, phase: 'Finisher'},
-    '38': {bw: 2345, fcr: 1.59, phase: 'Finisher'},
-    '39': {bw: 2438, fcr: 1.61, phase: 'Finisher'},
-    '40': {bw: 2528, fcr: 1.63, phase: 'Finisher'},
-    '41': {bw: 2621, fcr: 1.66, phase: 'Finisher'},
-    '42': {bw: 2711, fcr: 1.68, phase: 'Finisher'},
-    'Week VI': {bw: 2711, fcr: 1.68, phase: 'Finisher'},
-    '43': {bw: 2832, fcr: 1.70, phase: 'Finisher'},
-    '44': {bw: 2936, fcr: 1.71, phase: 'Finisher'},
-    '45': {bw: 3043, fcr: 1.73, phase: 'Finisher'},
-    '46': {bw: 3149, fcr: 1.74, phase: 'Finisher'},
-    '47': {bw: 3255, fcr: 1.75, phase: 'Finisher'},
-    '48': {bw: 3359, fcr: 1.77, phase: 'Finisher'},
-    '49': {bw: 3466, fcr: 1.78, phase: 'Finisher'},
-    'Week VII': {bw: 3466, fcr: 1.78, phase: 'Finisher'},
-    '50': {bw: 3602, fcr: 1.78, phase: 'Finisher'},
-    '51': {bw: 3725, fcr: 1.79, phase: 'Finisher'},
-    '52': {bw: 3845, fcr: 1.79, phase: 'Finisher'},
-    '53': {bw: 3968, fcr: 1.80, phase: 'Finisher'},
-    '54': {bw: 4088, fcr: 1.80, phase: 'Finisher'},
-    '55': {bw: 4211, fcr: 1.81, phase: 'Finisher'},
-    '56': {bw: 4331, fcr: 1.81, phase: 'Finisher'},
-    'Week VIII': {bw: 4331, fcr: 1.81, phase: 'Finisher'}
+    '1': {bw: 92, fcr: 0.24, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
+    '2': {bw: 115, fcr: 0.40, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
+    '3': {bw: 135, fcr: 0.53, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
+    '4': {bw: 158, fcr: 0.64, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
+    '5': {bw: 178, fcr: 0.75, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
+    '6': {bw: 201, fcr: 0.85, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
+    '7': {bw: 221, fcr: 0.95, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
+    '8': {bw: 264, fcr: 0.97, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
+    '9': {bw: 301, fcr: 1.00, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
+    '10': {bw: 338, fcr: 1.03, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
+    '11': {bw: 377, fcr: 1.07, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
+    '12': {bw: 413, fcr: 1.11, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
+    '13': {bw: 450, fcr: 1.16, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
+    '14': {bw: 487, fcr: 1.20, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
+    '15': {bw: 564, fcr: 1.20, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
+    '16': {bw: 621, fcr: 1.21, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
+    '17': {bw: 678, fcr: 1.23, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
+    '18': {bw: 737, fcr: 1.24, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
+    '19': {bw: 793, fcr: 1.26, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
+    '20': {bw: 850, fcr: 1.29, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
+    '21': {bw: 907, fcr: 1.31, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
+    '22': {bw: 1008, fcr: 1.31, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
+    '23': {bw: 1085, fcr: 1.32, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
+    '24': {bw: 1165, fcr: 1.33, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
+    '25': {bw: 1242, fcr: 1.35, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
+    '26': {bw: 1322, fcr: 1.37, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
+    '27': {bw: 1399, fcr: 1.39, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
+    '28': {bw: 1479, fcr: 1.41, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
+    '29': {bw: 1566, fcr: 1.43, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
+    '30': {bw: 1649, fcr: 1.45, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
+    '31': {bw: 1732, fcr: 1.47, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
+    '32': {bw: 1813, fcr: 1.48, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
+    '33': {bw: 1897, fcr: 1.50, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
+    '34': {bw: 1980, fcr: 1.52, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
+    '35': {bw: 2063, fcr: 1.54, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
+    '36': {bw: 2162, fcr: 1.56, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
+    '37': {bw: 2255, fcr: 1.57, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
+    '38': {bw: 2345, fcr: 1.59, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
+    '39': {bw: 2438, fcr: 1.61, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
+    '40': {bw: 2528, fcr: 1.63, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
+    '41': {bw: 2621, fcr: 1.66, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
+    '42': {bw: 2711, fcr: 1.68, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
+    '43': {bw: 2832, fcr: 1.70, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
+    '44': {bw: 2936, fcr: 1.71, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
+    '45': {bw: 3043, fcr: 1.73, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
+    '46': {bw: 3149, fcr: 1.74, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
+    '47': {bw: 3255, fcr: 1.75, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
+    '48': {bw: 3359, fcr: 1.77, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
+    '49': {bw: 3466, fcr: 1.78, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
+    '50': {bw: 3602, fcr: 1.78, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
+    '51': {bw: 3725, fcr: 1.79, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
+    '52': {bw: 3845, fcr: 1.79, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
+    '53': {bw: 3968, fcr: 1.80, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
+    '54': {bw: 4088, fcr: 1.80, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
+    '55': {bw: 4211, fcr: 1.81, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
+    '56': {bw: 4331, fcr: 1.81, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'}
   };
 
-  // Updated Nutrient Table incorporating Crude Protein targets
-  // Starter: 23.0% (22-25%) | Grower: 21.0% (20-22%) | Finisher: 19.0% (18-20%)
+  // All 41 nutrients from Image 2 with dynamic values across 3 periods
   const nutrients = [
-    {name: "Crude protein", unit: "%", Starter: 23.0, Grower: 21.0, Finisher: 19.0},
-    {name: "Arginine", unit: "%", Starter: 1.25, Grower: 1.10, Finisher: 1.00},
-    {name: "Glycine + serine", unit: "%", Starter: 1.25, Grower: 1.14, Finisher: 0.97},
-    {name: "Lysine", unit: "%", Starter: 1.10, Grower: 1.00, Finisher: 0.85},
-    {name: "Methionine", unit: "%", Starter: 0.50, Grower: 0.38, Finisher: 0.32},
-    {name: "Methionine + cystine", unit: "%", Starter: 0.90, Grower: 0.72, Finisher: 0.60},
-    {name: "Threonine", unit: "%", Starter: 0.80, Grower: 0.74, Finisher: 0.68},
-    {name: "Calcium", unit: "%", Starter: 1.00, Grower: 0.90, Finisher: 0.80},
-    {name: "Nonphytate phosphorus", unit: "%", Starter: 0.45, Grower: 0.35, Finisher: 0.30},
-    {name: "Sodium", unit: "%", Starter: 0.20, Grower: 0.15, Finisher: 0.12},
-    {name: "Choline", unit: "mg", Starter: 1300, Grower: 1000, Finisher: 750},
-    {name: "Manganese", unit: "mg", Starter: 60, Grower: 60, Finisher: 60},
-    {name: "Zinc", unit: "mg", Starter: 40, Grower: 40, Finisher: 40},
-    {name: "Vitamin A", unit: "IU", Starter: 1500, Grower: 1500, Finisher: 1500},
-    {name: "Vitamin D₃", unit: "ICU", Starter: 200, Grower: 200, Finisher: 200},
-    {name: "Vitamin E", unit: "IU", Starter: 10, Grower: 10, Finisher: 10}
+    {name: "Crude protein", unit: "%", w0_3: 23.0, w3_6: 20.0, w6_8: 18.0},
+    {name: "Arginine", unit: "%", w0_3: 1.25, w3_6: 1.10, w6_8: 1.00},
+    {name: "Glycine + serine", unit: "%", w0_3: 1.25, w3_6: 1.14, w6_8: 0.97},
+    {name: "Histidine", unit: "%", w0_3: 0.35, w3_6: 0.32, w6_8: 0.27},
+    {name: "Isoleucine", unit: "%", w0_3: 0.80, w3_6: 0.73, w6_8: 0.62},
+    {name: "Leucine", unit: "%", w0_3: 1.20, w3_6: 1.09, w6_8: 0.93},
+    {name: "Lysine", unit: "%", w0_3: 1.10, w3_6: 1.00, w6_8: 0.85},
+    {name: "Methionine", unit: "%", w0_3: 0.50, w3_6: 0.38, w6_8: 0.32},
+    {name: "Methionine + cystine", unit: "%", w0_3: 0.90, w3_6: 0.72, w6_8: 0.60},
+    {name: "Phenylalanine", unit: "%", w0_3: 0.72, w3_6: 0.65, w6_8: 0.56},
+    {name: "Phenylalanine + tyrosine", unit: "%", w0_3: 1.34, w3_6: 1.22, w6_8: 1.04},
+    {name: "Proline", unit: "%", w0_3: 0.60, w3_6: 0.55, w6_8: 0.46},
+    {name: "Threonine", unit: "%", w0_3: 0.80, w3_6: 0.74, w6_8: 0.68},
+    {name: "Tryptophan", unit: "%", w0_3: 0.20, w3_6: 0.18, w6_8: 0.16},
+    {name: "Valine", unit: "%", w0_3: 0.90, w3_6: 0.82, w6_8: 0.70},
+    {name: "Linoleic acid", unit: "%", w0_3: 1.00, w3_6: 1.00, w6_8: 1.00},
+    {name: "Calcium", unit: "%", w0_3: 1.00, w3_6: 0.90, w6_8: 0.80},
+    {name: "Chlorine", unit: "%", w0_3: 0.20, w3_6: 0.15, w6_8: 0.12},
+    {name: "Magnesium", unit: "mg", w0_3: 600.0, w3_6: 600.0, w6_8: 600.0},
+    {name: "Nonphytate phosphorus", unit: "%", w0_3: 0.45, w3_6: 0.35, w6_8: 0.30},
+    {name: "Potassium", unit: "%", w0_3: 0.30, w3_6: 0.30, w6_8: 0.30},
+    {name: "Sodium", unit: "%", w0_3: 0.20, w3_6: 0.15, w6_8: 0.12},
+    {name: "Copper", unit: "mg", w0_3: 8.0, w3_6: 8.0, w6_8: 8.0},
+    {name: "Iodine", unit: "mg", w0_3: 0.35, w3_6: 0.35, w6_8: 0.35},
+    {name: "Iron", unit: "mg", w0_3: 80.0, w3_6: 80.0, w6_8: 80.0},
+    {name: "Manganese", unit: "mg", w0_3: 60.0, w3_6: 60.0, w6_8: 60.0},
+    {name: "Selenium", unit: "mg", w0_3: 0.15, w3_6: 0.15, w6_8: 0.15},
+    {name: "Zinc", unit: "mg", w0_3: 40.0, w3_6: 40.0, w6_8: 40.0},
+    {name: "Vitamin A", unit: "IU", w0_3: 1500.0, w3_6: 1500.0, w6_8: 1500.0},
+    {name: "Vitamin D₃", unit: "ICU", w0_3: 200.0, w3_6: 200.0, w6_8: 200.0},
+    {name: "Vitamin E", unit: "IU", w0_3: 10.0, w3_6: 10.0, w6_8: 10.0},
+    {name: "Vitamin K", unit: "mg", w0_3: 0.5, w3_6: 0.5, w6_8: 0.5},
+    {name: "Vitamin B₁₂", unit: "mg", w0_3: 0.01, w3_6: 0.01, w6_8: 0.007},
+    {name: "Biotin", unit: "mg", w0_3: 0.15, w3_6: 0.15, w6_8: 0.12},
+    {name: "Choline", unit: "mg", w0_3: 1300.0, w3_6: 1000.0, w6_8: 750.0},
+    {name: "Folacin", unit: "mg", w0_3: 0.55, w3_6: 0.55, w6_8: 0.50},
+    {name: "Niacin", unit: "mg", w0_3: 35.0, w3_6: 30.0, w6_8: 25.0},
+    {name: "Pantothenic acid", unit: "mg", w0_3: 10.0, w3_6: 10.0, w6_8: 10.0},
+    {name: "Pyridoxine", unit: "mg", w0_3: 3.5, w3_6: 3.5, w6_8: 3.0},
+    {name: "Riboflavin", unit: "mg", w0_3: 3.6, w3_6: 3.6, w6_8: 3.0},
+    {name: "Thiamin", unit: "mg", w0_3: 1.8, w3_6: 1.8, w6_8: 1.8}
   ];
+
+  function updateStageBadge() {
+    const age = document.getElementById('age').value;
+    const benchmark = stdData[age];
+    
+    document.getElementById('badge1').classList.remove('active');
+    document.getElementById('badge2').classList.remove('active');
+    document.getElementById('badge3').classList.remove('active');
+
+    if (benchmark.phaseKey === 'w0_3') {
+      document.getElementById('badge1').classList.add('active');
+    } else if (benchmark.phaseKey === 'w3_6') {
+      document.getElementById('badge2').classList.add('active');
+    } else {
+      document.getElementById('badge3').classList.add('active');
+    }
+  }
 
   function calculate() {
     const age = document.getElementById('age').value;
@@ -308,14 +345,15 @@
     const benchmark = stdData[age];
     const stdBW = benchmark.bw;
     const fcr = benchmark.fcr;
-    const phase = benchmark.phase;
+    const phaseKey = benchmark.phaseKey;
+    const phaseLabel = benchmark.phaseLabel;
 
     const bwDeficit = Math.max(0, stdBW - actualBW);
     const catchupFeedGrams = bwDeficit * fcr;
     const flockExtraFeedKg = (catchupFeedGrams * flockSize) / 1000;
 
     document.getElementById('results').style.display = 'block';
-    document.getElementById('phaseDisplay').innerText = phase + ' Phase Stage';
+    document.getElementById('phaseDisplay').innerText = phaseLabel;
     document.getElementById('stdBWDisplay').innerText = stdBW + ' g';
     document.getElementById('actBWDisplay').innerText = actualBW + ' g';
     document.getElementById('bwDefDisplay').innerText = bwDeficit.toFixed(1) + ' g';
@@ -324,7 +362,7 @@
     const alertBox = document.getElementById('alertBox');
     if (bwDeficit > 0) {
       alertBox.style.display = 'block';
-      alertBox.innerHTML = `⚠️ Flock is <b>${bwDeficit.toFixed(1)} g underweight</b> in the <b>${phase} stage</b>. Additional balanced feed required across ${flockSize.toLocaleString()} birds: <b>${flockExtraFeedKg.toFixed(2)} kg</b>.`;
+      alertBox.innerHTML = `⚠️ Flock is <b>${bwDeficit.toFixed(1)} g underweight</b> in the <b>${phaseLabel}</b>. Additional balanced feed required across ${flockSize.toLocaleString()} birds: <b>${flockExtraFeedKg.toFixed(2)} kg</b>.`;
     } else {
       alertBox.style.display = 'none';
     }
@@ -333,7 +371,7 @@
     tbody.innerHTML = '';
 
     nutrients.forEach(n => {
-      const req = n[phase];
+      const req = n[phaseKey]; // Dynamically selects requirement for the active phase
       let defBird = 0;
       let defFlockFormatted = '';
       let dispUnit = '';
@@ -365,6 +403,9 @@
       tbody.appendChild(tr);
     });
   }
+
+  // Initialize active stage badge on load
+  updateStageBadge();
 </script>
 
 </body>
