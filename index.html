@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Broiler Nutrient Deficit Diagnostic System</title>
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --secondary: #059669;
+      --warning: #dc2626;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 12px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      margin-bottom: 16px;
+    }
+    h2, h3, h4 {
+      margin-top: 0;
+      color: var(--primary);
+    }
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+    select, input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+    button {
+      background-color: var(--secondary);
+      color: white;
+      font-weight: 700;
+      border: none;
+      margin-top: 18px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background-color: #047857;
+    }
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .metric-box {
+      background: #f1f5f9;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .metric-box label {
+      font-size: 12px;
+      color: #64748b;
+      margin: 0;
+    }
+    .metric-box .val {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-top: 4px;
+    }
+    .metric-box.danger .val {
+      color: var(--warning);
+    }
+    .table-container {
+      overflow-x: auto;
+      margin-top: 12px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #e2e8f0;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #1e293b;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+    .alert {
+      padding: 12px;
+      border-radius: 8px;
+      background-color: #fef2f2;
+      border-left: 4px solid var(--warning);
+      color: #991b1b;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+    <h2>🐔 Broiler Deficit Diagnostics</h2>
+    <p style="font-size:13px; color:#64748b; margin-bottom:12px;">Standard baseline synced with Ross/NRC guidelines.</p>
+    
+    <label for="age">Bird Age / Phase Stage:</label>
+    <select id="age">
+      <option value="1">Day 1</option>
+      <option value="7" selected>Day 7 (Week I)</option>
+      <option value="14">Day 14 (Week II)</option>
+      <option value="21">Day 21 (Week III)</option>
+      <option value="28">Day 28 (Week IV)</option>
+      <option value="35">Day 35 (Week V)</option>
+      <option value="42">Day 42 (Week VI)</option>
+      <option value="49">Day 49 (Week VII)</option>
+      <option value="56">Day 56 (Week VIII)</option>
+    </select>
+
+    <label for="actualBW">Observed Average Weight (grams / bird):</label>
+    <input type="number" id="actualBW" value="170" step="1">
+
+    <label for="flockSize">Total Flock Size (Number of Birds):</label>
+    <input type="number" id="flockSize" value="10000" step="500">
+
+    <button onclick="calculate()">Calculate Deficit & Requirements</button>
+  </div>
+
+  <div class="card" id="results" style="display:none;">
+    <h3>📊 Diagnostic Summary</h3>
+    
+    <div class="metrics-grid">
+      <div class="metric-box">
+        <label>Target Body Weight</label>
+        <div class="val" id="stdBWDisplay">-</div>
+      </div>
+      <div class="metric-box">
+        <label>Observed Weight</label>
+        <div class="val" id="actBWDisplay">-</div>
+      </div>
+      <div class="metric-box danger">
+        <label>Weight Deficit</label>
+        <div class="val" id="bwDefDisplay">-</div>
+      </div>
+      <div class="metric-box">
+        <label>Extra Feed Needed</label>
+        <div class="val" id="feedNeedDisplay">-</div>
+      </div>
+    </div>
+
+    <div id="alertBox" class="alert"></div>
+
+    <h4 style="margin-top:20px;">🧪 Deficit Recovery Breakdown</h4>
+    <div class="table-container">
+      <table id="nutrientTable">
+        <thead>
+          <tr>
+            <th>Nutrient</th>
+            <th>Diet Requirement</th>
+            <th>Deficit / Bird</th>
+            <th>Flock Deficit Total</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  const stdData = {
+    '1': {bw: 61, fcr: 0.24, phase: 'Starter'},
+    '7': {bw: 190, fcr: 0.95, phase: 'Starter'},
+    '14': {bw: 450, fcr: 1.20, phase: 'Starter'},
+    '21': {bw: 850, fcr: 1.31, phase: 'Starter'},
+    '28': {bw: 1400, fcr: 1.41, phase: 'Grower'},
+    '35': {bw: 1980, fcr: 1.54, phase: 'Grower'},
+    '42': {bw: 2620, fcr: 1.68, phase: 'Grower'},
+    '49': {bw: 3360, fcr: 1.78, phase: 'Finisher'},
+    '56': {bw: 4210, fcr: 1.81, phase: 'Finisher'}
+  };
+
+  const nutrients = [
+    {name: "Crude protein", unit: "%", Starter: 23.0, Grower: 20.0, Finisher: 18.0},
+    {name: "Arginine", unit: "%", Starter: 1.25, Grower: 1.10, Finisher: 1.00},
+    {name: "Glycine + serine", unit: "%", Starter: 1.25, Grower: 1.14, Finisher: 0.97},
+    {name: "Lysine", unit: "%", Starter: 1.10, Grower: 1.00, Finisher: 0.85},
+    {name: "Methionine", unit: "%", Starter: 0.50, Grower: 0.38, Finisher: 0.32},
+    {name: "Methionine + cystine", unit: "%", Starter: 0.90, Grower: 0.72, Finisher: 0.60},
+    {name: "Threonine", unit: "%", Starter: 0.80, Grower: 0.74, Finisher: 0.68},
+    {name: "Calcium", unit: "%", Starter: 1.00, Grower: 0.90, Finisher: 0.80},
+    {name: "Nonphytate phosphorus", unit: "%", Starter: 0.45, Grower: 0.35, Finisher: 0.30},
+    {name: "Sodium", unit: "%", Starter: 0.20, Grower: 0.15, Finisher: 0.12},
+    {name: "Choline", unit: "mg", Starter: 1300, Grower: 1000, Finisher: 750},
+    {name: "Manganese", unit: "mg", Starter: 60, Grower: 60, Finisher: 60},
+    {name: "Zinc", unit: "mg", Starter: 40, Grower: 40, Finisher: 40},
+    {name: "Vitamin A", unit: "IU", Starter: 1500, Grower: 1500, Finisher: 1500},
+    {name: "Vitamin D₃", unit: "ICU", Starter: 200, Grower: 200, Finisher: 200},
+    {name: "Vitamin E", unit: "IU", Starter: 10, Grower: 10, Finisher: 10}
+  ];
+
+  function calculate() {
+    const age = document.getElementById('age').value;
+    const actualBW = parseFloat(document.getElementById('actualBW').value);
+    const flockSize = parseInt(document.getElementById('flockSize').value);
+
+    const benchmark = stdData[age];
+    const stdBW = benchmark.bw;
+    const fcr = benchmark.fcr;
+    const phase = benchmark.phase;
+
+    const bwDeficit = Math.max(0, stdBW - actualBW);
+    const catchupFeedGrams = bwDeficit * fcr;
+    const flockExtraFeedKg = (catchupFeedGrams * flockSize) / 1000;
+
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('stdBWDisplay').innerText = stdBW + ' g';
+    document.getElementById('actBWDisplay').innerText = actualBW + ' g';
+    document.getElementById('bwDefDisplay').innerText = bwDeficit.toFixed(1) + ' g';
+    document.getElementById('feedNeedDisplay').innerText = catchupFeedGrams.toFixed(1) + ' g/bird';
+
+    const alertBox = document.getElementById('alertBox');
+    if (bwDeficit > 0) {
+      alertBox.style.display = 'block';
+      alertBox.innerHTML = `⚠️ Flock is <b>${bwDeficit.toFixed(1)} g underweight</b>. Extra feed needed across ${flockSize.toLocaleString()} birds to recover target weight: <b>${flockExtraFeedKg.toFixed(2)} kg</b>.`;
+    } else {
+      alertBox.style.display = 'none';
+    }
+
+    const tbody = document.querySelector('#nutrientTable tbody');
+    tbody.innerHTML = '';
+
+    nutrients.forEach(n => {
+      const req = n[phase];
+      let defBird = 0;
+      let defFlockFormatted = '';
+      let dispUnit = '';
+
+      if (n.unit === '%') {
+        defBird = (req / 100.0) * catchupFeedGrams;
+        const flockKg = (defBird * flockSize) / 1000.0;
+        dispUnit = 'g';
+        defFlockFormatted = flockKg.toFixed(2) + ' kg';
+      } else if (n.unit === 'mg') {
+        defBird = (req / 1000.0) * catchupFeedGrams;
+        const flockKg = (defBird * flockSize) / 1000000.0;
+        dispUnit = 'mg';
+        defFlockFormatted = (flockKg >= 1) ? flockKg.toFixed(2) + ' kg' : (flockKg * 1000).toFixed(1) + ' g';
+      } else { // IU / ICU
+        defBird = (req / 1000.0) * catchupFeedGrams;
+        const flockTotal = defBird * flockSize;
+        dispUnit = n.unit;
+        defFlockFormatted = flockTotal.toLocaleString(undefined, {maximumFractionDigits: 0}) + ' ' + n.unit;
+      }
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><b>${n.name}</b></td>
+        <td>${req} ${n.unit}${n.unit !== '%' ? '/kg' : ''}</td>
+        <td>${defBird.toFixed(3)} ${dispUnit}</td>
+        <td><b>${defFlockFormatted}</b></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+</script>
+
+</body>
+</html>
