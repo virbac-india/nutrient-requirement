@@ -196,39 +196,40 @@
       transform-origin: bottom left;
       clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
     }
-    .custom-checkbox:checked {
-      background-color: #006aff;
-      border-color: #006aff;
-    }
-    .custom-checkbox:checked::before {
-      transform: scale(1);
-    }
+    .custom-checkbox:checked { background-color: #006aff; border-color: #006aff; }
+    .custom-checkbox:checked::before { transform: scale(1); }
 
-    /* Add Product Dropdown */
+    /* Flex Header for Section 3 */
+    .section-header-flex {
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      border-bottom: 1px solid var(--border); 
+      padding-bottom: 12px; 
+      margin-bottom: 16px;
+    }
+    .section-header-flex h3 { border: none; padding: 0; margin: 0; }
+    
     .add-product-container {
-      margin-top: 15px;
-      padding: 15px;
-      background-color: #f8fafc;
-      border: 1px dashed var(--border);
-      border-radius: 8px;
       display: flex;
       gap: 10px;
       align-items: center;
     }
-    .add-product-container select { flex: 1; }
-    .add-product-container button { width: auto; min-height: 44px; padding: 0 20px; margin: 0; }
+    .add-product-container select { width: 220px; min-height: 40px; padding: 8px 12px; font-size: 14px; }
+    .add-product-container button { width: auto; min-height: 40px; padding: 0 16px; margin: 0; font-size: 14px; }
     
     /* Screens */
     #appScreen, #authScreen, #registerForm, #layerParams, #resultsSection, #costReport { display: none; }
     
-    @media (max-width: 600px) {
+    @media (max-width: 700px) {
       .grid-2 { grid-template-columns: 1fr; gap: 10px; }
       .profile-banner { flex-direction: column; align-items: flex-start; gap: 15px; }
       .card-body { padding: 16px; }
       .brand-logo { height: 24px; }
       .app-title { font-size: 16px; }
-      .add-product-container { flex-direction: column; align-items: stretch; }
-      .add-product-container button { width: 100%; }
+      .section-header-flex { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .add-product-container { width: 100%; }
+      .add-product-container select { flex: 1; width: auto; }
     }
 
     /* Print / PDF Styles */
@@ -245,6 +246,7 @@
       .alert.danger { background: #fef2f2 !important; border-left: 4px solid var(--warning) !important; }
       .alert.success { background: #dcfce7 !important; border-left: 4px solid var(--success) !important; }
       .table-responsive { overflow-x: visible; }
+      .print-input { border: none !important; padding: 0 !important; background: transparent !important; width: auto !important; font-weight: 600 !important; }
     }
   </style>
 </head>
@@ -280,8 +282,17 @@
           <div class="grid-2">
             <div class="form-group"><label>Full Name *</label><input type="text" id="regName" placeholder="Ramesh Kumar"></div>
             <div class="form-group"><label>Email Address *</label><input type="email" id="regEmail" placeholder="ramesh@virbac.com"></div>
-            <div class="form-group"><label>Employee Code</label><input type="text" id="regEmpCode" placeholder="e.g., VB-1042"></div>
-            <div class="form-group"><label>BU Unit</label><input type="text" id="regBuUnit" placeholder="e.g., Poultry North"></div>
+            <div class="form-group"><label>Employee Code</label><input type="text" id="regEmpCode" placeholder="e.g., 302123"></div>
+            <div class="form-group">
+                <label>BU Unit</label>
+                <select id="regBuUnit">
+                    <option value="BU I">BU I</option>
+                    <option value="BU II">BU II</option>
+                    <option value="BU III">BU III</option>
+                    <option value="BU IV">BU IV</option>
+                    <option value="BU V">BU V</option>
+                </select>
+            </div>
             <div class="form-group"><label>Region</label><input type="text" id="regRegion" placeholder="e.g., Punjab"></div>
             <div class="form-group"><label>HQ Name</label><input type="text" id="regHq" placeholder="e.g., Ludhiana"></div>
           </div>
@@ -330,25 +341,6 @@
             <div class="form-group"><label>Mobile / WhatsApp *</label><input type="tel" id="mobile" placeholder="+91 "></div>
             <div class="form-group"><label>Visit Date & Time *</label><input type="datetime-local" id="visitDate"></div>
           </div>
-
-          <!-- Schedule reminder using standard "mailto" protocol (No Zapier needed) -->
-          <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-top: 15px;">
-            <label style="color: var(--primary);">📧 Setup Offline Calendar/Email Reminder</label>
-            <div class="grid-2" style="align-items: end;">
-                <div class="form-group" style="margin-bottom:0;">
-                    <label>Remind me after (Days) *</label>
-                    <input type="number" id="followUpDays" value="7" min="1">
-                </div>
-                <button class="btn-outline no-print" style="margin:0; background: white; border-color: var(--primary);" onclick="triggerMailToReminder()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                    Add to Calendar/Email
-                </button>
-            </div>
-            <small class="no-print" style="color:#64748b; margin-top:8px; display:block;">
-                * This will open your default email/calendar app to schedule a secure offline reminder.
-            </small>
-          </div>
-
         </div>
       </div>
 
@@ -374,8 +366,8 @@
             <div class="form-group">
               <label>Layer Breed</label>
               <select id="layerBreed">
-                <option value="bv380">BV 380 / Commercial Brown</option>
-                <option value="babcock">Babcock / Commercial White</option>
+                <option value="bv380">BV 380 (Commercial Brown)</option>
+                <option value="babcock">Babcock (Commercial White)</option>
               </select>
             </div>
             <div class="form-group"><label>Flock Age (in Weeks)</label><input type="number" id="layerAge" value="25"></div>
@@ -425,8 +417,18 @@
 
         <div class="card no-print">
           <div class="card-body">
-            <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">03. Product Planner & Costing</h3>
-            <p style="font-size:14px; color:#475569; margin-bottom: 20px;">Select required products for intervention/maintenance to calculate costs.</p>
+            <div class="section-header-flex">
+                <h3>03. Product Planner & Costing</h3>
+                <div class="add-product-container no-print">
+                  <select id="productDropdown">
+                    <option value="" disabled selected>-- Select a Product to Add --</option>
+                  </select>
+                  <button class="btn-outline" onclick="addProductToPlanner()">
+                     + Add Product
+                  </button>
+                </div>
+            </div>
+            <p style="font-size:14px; color:#475569; margin-bottom: 20px;">Select required products and enter your offered Customer Pricing to calculate costs.</p>
             
             <div class="table-responsive">
               <table id="plannerTable">
@@ -435,26 +437,15 @@
                     <th class="col-select" style="width: 50px; text-align:center;">Select</th>
                     <th>Product & Pack</th>
                     <th>Standard Dose Rate</th>
-                    <th>MRP (₹)</th>
+                    <th>Customer Price (₹)</th>
                   </tr>
                 </thead>
                 <tbody id="selectedProductsTbody">
                   <tr id="emptyPlannerRow">
-                    <td colspan="4" style="text-align:center; padding:30px; color:#94a3b8; font-style:italic;">No products selected yet. Select a product below to add it to the planner.</td>
+                    <td colspan="4" style="text-align:center; padding:30px; color:#94a3b8; font-style:italic;">No products selected yet. Use the dropdown above to add products.</td>
                   </tr>
                 </tbody>
               </table>
-            </div>
-
-            <div class="add-product-container">
-              <select id="productDropdown">
-                <option value="" disabled selected>-- Select a Product to Add --</option>
-                <!-- Populated dynamically -->
-              </select>
-              <button class="btn-outline" onclick="addProductToPlanner()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Add Product
-              </button>
             </div>
             
             <div class="form-group" style="margin-top:20px; max-width: 300px;">
@@ -476,8 +467,8 @@
                     <th>Pack Size</th>
                     <th>Total Vol Required</th>
                     <th>Packs Needed</th>
-                    <th>Farmer Cost (MRP)</th>
-                    <th>Cost / Bird / Day</th>
+                    <th>Farmer Cost (₹)</th>
+                    <th>Cost / Bird / Day (₹)</th>
                   </tr>
                 </thead>
                 <tbody id="costTbody"></tbody>
@@ -485,10 +476,28 @@
                   <tr style="background-color: #f8fafc; font-weight: 700;">
                     <td colspan="4" style="text-align: right; color: var(--primary);">Total Estimated Cost:</td>
                     <td style="color: var(--primary); font-size: 16px;" id="totalCostCell">₹0</td>
-                    <td></td>
+                    <td style="color: var(--primary); font-size: 16px;" id="totalCostBirdDayCell">₹0.00</td>
                   </tr>
                 </tfoot>
               </table>
+            </div>
+
+            <!-- Moved Reminder Section here -->
+            <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-top: 30px;" class="no-print">
+              <label style="color: var(--primary);">📅 Self Follow-Up Reminder</label>
+              <div class="grid-2" style="align-items: end;">
+                  <div class="form-group" style="margin-bottom:0;">
+                      <label>Remind me after (Days) *</label>
+                      <input type="number" id="followUpDays" value="7" min="1">
+                  </div>
+                  <button class="btn-outline no-print" style="margin:0; background: white; border-color: var(--primary);" onclick="triggerCalendarReminder()">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                      Download Calendar Event (.ics)
+                  </button>
+              </div>
+              <small style="color:#64748b; margin-top:8px; display:block;">
+                  * This downloads a calendar event for you to add to your personal device.
+              </small>
             </div>
             
             <div id="print-btn-container" class="no-print" style="margin-top:30px; text-align:center; padding-top: 20px; border-top: 1px solid var(--border);">
@@ -551,8 +560,14 @@
       cobb500: { 0:42, 7:204, 14:496, 21:963, 28:1603, 35:2395, 42:3286, 49:4216, 56:5100 }
     },
     layer: {
-      weight: { 1:75, 5:390, 10:840, 15:1250, 20:1600, 25:1750, 30:1850, 40:1900, 50:1920, 80:1950 },
-      prod: { 18:5, 19:30, 20:55, 21:80, 22:90, 25:96, 30:96, 40:94, 50:90, 60:85, 70:80, 80:75 }
+      weight: { 
+        bv380: { 1:75, 5:390, 10:840, 15:1250, 20:1600, 25:1750, 30:1850, 40:1900, 50:1920, 80:1950 },
+        babcock: { 1:65, 5:330, 10:730, 15:1060, 20:1350, 25:1510, 30:1560, 40:1620, 80:1700 }
+      },
+      prod: { 
+        bv380: { 18:5, 19:30, 20:55, 21:80, 22:90, 25:96, 30:96, 40:94, 50:90, 60:85, 70:80, 80:75 },
+        babcock: { 18:5, 19:35, 20:65, 21:85, 22:92, 25:96, 30:96, 40:95, 50:91, 60:87, 70:83, 80:78 }
+      }
     }
   };
 
@@ -578,10 +593,7 @@
   let selectedProductsList = []; 
 
   window.onload = function() {
-    // Get profiles array instead of a single object
     const savedProfiles = JSON.parse(localStorage.getItem('virbac_bo_profiles') || '[]');
-    
-    // If a current_email exists in session storage, use it (for keeping logged in across reloads)
     const activeEmail = sessionStorage.getItem('active_bo_email');
     if (activeEmail && savedProfiles.length > 0) {
        currentUser = savedProfiles.find(p => p.email === activeEmail);
@@ -737,14 +749,15 @@
             <ul class="pointers-list">
                 <li><strong>Management:</strong> Sub-optimal brooding temperature, poor ventilation, or high stocking density.</li>
                 <li><strong>Feed & Water:</strong> Poor early feed intake, inadequate feeder/drinker space, or restricted water access.</li>
-                <li><strong>Toxins:</strong> Mycotoxin contamination in feed reducing nutrient absorption (Consider <em>Toximar Forte</em>).</li>
-                <li><strong>Health:</strong> Early yolk sac infection (Consider <em>Anabolite-P</em>), Sub-clinical Coccidiosis, Enteric diseases, or CRD stress (Consider <em>Trox</em>).</li>
+                <li><strong>Toxins & Health:</strong> Mycotoxin contamination in feed reducing nutrient absorption (Consider <em>Carniforcyl / Toximar Forte</em>).</li>
+                <li><strong>Infections:</strong> Early yolk sac infection (Consider <em>Anabolite-P</em>), Sub-clinical Coccidiosis, Enteric diseases, or CRD stress (Consider <em>Trox</em>).</li>
             </ul>
             <em>Select supportive therapies below to formulate a rapid recovery plan.</em>`;
         }
         currentDiagnosticState = { size };
         
     } else {
+        const breed = document.getElementById('layerBreed').value;
         const age = parseInt(document.getElementById('layerAge').value); 
         const size = parseInt(document.getElementById('layerSize').value);
         const actBW = parseFloat(document.getElementById('layerBW').value);
@@ -752,12 +765,12 @@
         
         if(!age || !size || !actBW || isNaN(actProd)) return alert("Please fill in all Layer diagnostic fields.");
 
-        const targetBW = getInterpolatedTarget(standards.layer.weight, age);
+        const targetBW = getInterpolatedTarget(standards.layer.weight[breed], age);
         const varianceBW = actBW - targetBW;
         const varBWPercent = (varianceBW / targetBW) * 100;
 
         let targetProd = 0;
-        if(age >= 18) targetProd = getInterpolatedTarget(standards.layer.prod, age);
+        if(age >= 18) targetProd = getInterpolatedTarget(standards.layer.prod[breed], age);
         const varianceProd = actProd - targetProd;
 
         document.getElementById('resTarget').innerText = targetBW.toFixed(0) + ' g';
@@ -788,7 +801,7 @@
                 <li><strong>Nutrition:</strong> Calcium/Phosphorus imbalance or Vitamin D3 deficiency causing drops in production or thin shells (Consider <em>Calgophos</em>).</li>
                 <li><strong>Stress factors:</strong> Inadequate lighting schedule, sudden light interruption, or Heat stress reducing feed intake (Consider <em>Vimeral Forte</em>).</li>
                 <li><strong>Health:</strong> Viral challenges (ND, IB, EDS) affecting reproductive tract or Liver stress / Fatty Liver syndrome (Consider <em>Brotone</em>).</li>
-                <li><strong>Toxins & Parasites:</strong> Worm infestation (Consider <em>Albomar</em>) or Mycotoxin load impacting liver function.</li>
+                <li><strong>Toxins & Parasites:</strong> Worm infestation (Consider <em>Albomar</em>) or Mycotoxin load impacting liver function (Consider <em>Carniforcyl</em>).</li>
             </ul>
             <em>Select supportive therapies below to formulate a recovery plan.</em>`;
         }
@@ -799,20 +812,38 @@
     document.getElementById('printFarmTypeLabel').style.display = 'block';
   }
 
-  function triggerMailToReminder() {
+  // Generate .ics file for calendar reminder
+  function triggerCalendarReminder() {
     const followUpDays = parseInt(document.getElementById('followUpDays').value) || 7;
     const farmName = document.getElementById('farmName').value || "Farm";
     const farmerName = document.getElementById('farmerName').value || "Farmer";
     const mobile = document.getElementById('mobile').value || "";
-    
-    const visitDate = new Date();
-    visitDate.setDate(visitDate.getDate() + followUpDays);
-    const dateString = visitDate.toDateString();
 
-    const subject = encodeURIComponent(`Follow-Up Reminder: ${farmName} (${farmerName})`);
-    const body = encodeURIComponent(`Hi ${currentUser.name},\n\nThis is your scheduled follow-up reminder for:\n\nFarm: ${farmName}\nFarmer: ${farmerName}\nContact: ${mobile}\n\nPlease check in on the suggested treatment plan.\n\nAutomated via Virbac Poultry Connect.`);
+    const eventDate = new Date();
+    eventDate.setDate(eventDate.getDate() + followUpDays);
     
-    window.location.href = `mailto:${currentUser.email}?subject=${subject}&body=${body}`;
+    // Format to YYYYMMDD
+    const formattedDate = eventDate.toISOString().replace(/-|:|\.\d+/g, "").slice(0, 8); 
+    
+    const icsData = `BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:${formattedDate}
+DTEND;VALUE=DATE:${formattedDate}
+SUMMARY:Virbac Follow-up: ${farmName}
+DESCRIPTION:Follow up with ${farmerName}. Contact: ${mobile}.
+END:VEVENT
+END:VCALENDAR`;
+
+    const blob = new Blob([icsData], { type: 'text/calendar' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `FollowUp_${farmName.replace(/\s+/g, '_')}.ics`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
   }
 
   function populateDropdown() {
@@ -820,7 +851,7 @@
     products.forEach((p, idx) => {
       const option = document.createElement('option');
       option.value = idx;
-      option.text = `${p.name} (MRP: ₹${p.mrp})`;
+      option.text = p.name; // Removed MRP from text as per request
       dropdown.add(option);
     });
   }
@@ -852,7 +883,7 @@
   function renderSelectedProducts() {
     const tbody = document.getElementById('selectedProductsTbody');
     if(selectedProductsList.length === 0) {
-        tbody.innerHTML = `<tr id="emptyPlannerRow"><td colspan="4" style="text-align:center; padding:30px; color:#94a3b8; font-style:italic;">No products selected yet. Select a product below to add it to the planner.</td></tr>`;
+        tbody.innerHTML = `<tr id="emptyPlannerRow"><td colspan="4" style="text-align:center; padding:30px; color:#94a3b8; font-style:italic;">No products selected yet. Use the dropdown above to add products.</td></tr>`;
         return;
     }
     
@@ -867,11 +898,13 @@
           <td><b>${p.name}</b><br><small style="color:#64748b;">${p.group}</small></td>
           <td>
             <div style="display:flex; align-items:center; gap:8px;">
-                <input type="number" id="dose_${idx}" value="${p.dosePer100}" style="width:70px; padding:6px; font-size:14px; min-height:30px;">
+                <input type="number" id="dose_${idx}" value="${p.dosePer100}" class="print-input" onchange="this.setAttribute('value', this.value)" style="width:70px; padding:6px; font-size:14px; min-height:30px;">
                 <span style="font-size:13px; color:#475569;">${p.unit}/100birds</span>
             </div>
           </td>
-          <td style="font-weight:600; color:var(--text);">₹${p.mrp}</td>
+          <td>
+            <input type="number" id="price_${idx}" placeholder="Enter Price" class="print-input" onchange="this.setAttribute('value', this.value)" style="width:110px; padding:6px; font-size:14px; min-height:30px;">
+          </td>
         </tr>
       `;
     });
@@ -889,11 +922,22 @@
     if (checkboxes.length === 0) return alert("Add and select at least one product to generate a cost report.");
 
     let totalCost = 0;
+    let totalCostPerBirdDay = 0;
+
+    let hasEmptyPrice = false;
 
     checkboxes.forEach(cb => {
       const idx = cb.value;
       const p = products[idx];
+      
       const customDose = parseFloat(document.getElementById(`dose_${idx}`).value);
+      const customPriceVal = document.getElementById(`price_${idx}`).value;
+      
+      if(!customPriceVal) {
+          hasEmptyPrice = true;
+      }
+      
+      const customPrice = parseFloat(customPriceVal) || 0; // fallback to 0 if empty just to continue math if ignored
       
       let totalUnitsReq = 0;
       if(p.unit === 'vial') {
@@ -906,8 +950,11 @@
       if (p.unit === 'vial') packsNeeded = totalUnitsReq;
       else packsNeeded = Math.ceil(totalUnitsReq / p.packVol);
 
-      const rowCost = packsNeeded * p.mrp;
+      const rowCost = packsNeeded * customPrice;
       totalCost += rowCost;
+      
+      const costPerBirdPerDay = rowCost / size / days;
+      totalCostPerBirdDay += costPerBirdPerDay;
 
       let displayUnit = "";
       if(p.unit === 'vial') displayUnit = totalUnitsReq + " Vials";
@@ -923,12 +970,17 @@
           <td>${displayUnit}</td>
           <td>${packsNeeded}</td>
           <td style="font-weight:600;">₹${rowCost.toLocaleString()}</td>
-          <td>₹${(rowCost / size / days).toFixed(2)}</td>
+          <td>₹${costPerBirdPerDay.toFixed(2)}</td>
         </tr>
       `;
     });
 
+    if(hasEmptyPrice) {
+        alert("Warning: Some selected products have no Customer Price entered. Their cost will be calculated as ₹0.");
+    }
+
     document.getElementById('totalCostCell').innerText = `₹${totalCost.toLocaleString()}`;
+    document.getElementById('totalCostBirdDayCell').innerText = `₹${totalCostPerBirdDay.toFixed(2)}`;
     document.getElementById('costReport').style.display = 'block';
   }
 </script>
