@@ -6,7 +6,7 @@
   <title>Poultry Connect | Virbac</title>
   <style>
     :root {
-      --primary: #153c8a; /* Virbac Blue */
+      --primary: #153c8a;
       --secondary: #059669;
       --warning: #dc2626;
       --success: #16a34a;
@@ -83,6 +83,37 @@
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(21, 60, 138, 0.1);
+    }
+
+    .input-group {
+      display: flex;
+      align-items: stretch;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+      transition: all 0.2s;
+    }
+    .input-group:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(21, 60, 138, 0.1);
+    }
+    .input-group-text {
+      padding: 0 12px;
+      background: #f8fafc;
+      border-right: 1px solid var(--border);
+      color: #475569;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+    }
+    .input-group input {
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      outline: none !important;
+      flex: 1;
     }
 
     .farm-type-selector {
@@ -243,6 +274,10 @@
       .alert.success { background: #dcfce7 !important; border-left: 4px solid var(--success) !important; }
       .table-responsive { overflow-x: visible; }
       .print-input { border: none !important; padding: 0 !important; background: transparent !important; width: auto !important; font-weight: 600 !important; }
+      
+      .input-group { border: none !important; }
+      .input-group-text { background: transparent !important; padding-left: 0 !important; border: none !important; display:none; }
+      .input-group input { padding-left: 0 !important; }
     }
   </style>
 </head>
@@ -329,13 +364,18 @@
           <div class="grid-2">
             <div class="form-group"><label>Farmer Name *</label><input type="text" id="farmerName" placeholder="e.g. Ramesh Babu"></div>
             <div class="form-group"><label>Poultry Farm Name *</label><input type="text" id="farmName" placeholder="e.g. Sri Sai Poultry"></div>
+            
             <div class="form-group">
                 <label>Mobile / WhatsApp *</label>
                 <div style="display:flex; gap:10px;">
-                  <input type="tel" id="mobile" placeholder="+91 " style="flex:1;">
+                  <div class="input-group" style="flex:1;">
+                    <span class="input-group-text">+91</span>
+                    <input type="tel" id="mobile" placeholder="98480 00000" maxlength="10">
+                  </div>
                   <button class="btn-outline no-print" onclick="checkHistory()" style="margin:0; width:auto; padding:0 15px;">&#128269; History</button>
                 </div>
             </div>
+            
             <div class="form-group"><label>Visit Date & Time *</label><input type="datetime-local" id="visitDate"></div>
           </div>
           
@@ -372,8 +412,11 @@
             <div class="form-group">
               <label>Broiler Breed</label>
               <select id="broilerBreed">
-                <option value="ross308">Ross 308 (Official Standard)</option>
-                <option value="cobb500">Cobb 500 (Official Standard)</option>
+                <option value="ross308">Ross 308</option>
+                <option value="cobb500">Cobb 500</option>
+                <option value="cobb700">Cobb 700</option>
+                <option value="hubbard">Hubbard</option>
+                <option value="vencobb">Vencobb</option>
               </select>
             </div>
             <div class="form-group"><label>Flock Age (in Days)</label><input type="number" id="broilerAge" value="21"></div>
@@ -385,8 +428,12 @@
             <div class="form-group">
               <label>Layer Breed</label>
               <select id="layerBreed">
-                <option value="bv380">BV 380 (Commercial Brown)</option>
-                <option value="babcock">Babcock (Commercial White)</option>
+                <option value="bv380">BV-380 (Brown)</option>
+                <option value="bv300">BV-300 (White)</option>
+                <option value="hylineW36">Hy-Line W-36</option>
+                <option value="hylineBrown">Hy-Line Brown</option>
+                <option value="priya">Priya</option>
+                <option value="ili80">ILI-80</option>
               </select>
             </div>
             <div class="form-group"><label>Flock Age (in Weeks)</label><input type="number" id="layerAge" value="25"></div>
@@ -509,6 +556,7 @@
                       <input type="number" id="followUpDays" value="7" min="1">
                   </div>
                   <button class="btn-outline no-print" style="margin:0; background: white; border-color: var(--primary);" onclick="triggerCalendarReminder()">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                       Download Calendar Event (.ics)
                   </button>
               </div>
@@ -577,16 +625,27 @@
   const standards = {
     broiler: {
       ross308: { 0:42, 7:205, 14:494, 21:959, 28:1597, 35:2382, 42:3252, 49:4141, 56:5000 },
-      cobb500: { 0:42, 7:204, 14:496, 21:963, 28:1603, 35:2395, 42:3286, 49:4216, 56:5100 }
+      cobb500: { 0:42, 7:204, 14:496, 21:963, 28:1603, 35:2395, 42:3286, 49:4216, 56:5100 },
+      cobb700: { 0:42, 7:204, 14:510, 21:1010, 28:1700, 35:2550, 42:3500, 49:4200, 56:5150 },
+      hubbard: { 0:42, 7:200, 14:490, 21:960, 28:1600, 35:2400, 42:3300, 49:4100, 56:4900 },
+      vencobb: { 0:42, 7:200, 14:490, 21:950, 28:1550, 35:2350, 42:3100, 49:3900, 56:4700 }
     },
     layer: {
       weight: { 
         bv380: { 1:75, 5:390, 10:840, 15:1250, 20:1600, 25:1750, 30:1850, 40:1900, 50:1920, 80:1950 },
-        babcock: { 1:65, 5:330, 10:730, 15:1060, 20:1350, 25:1510, 30:1560, 40:1620, 80:1700 }
+        bv300: { 1:70, 5:350, 10:780, 15:1150, 20:1400, 25:1500, 30:1550, 40:1600, 50:1620, 80:1650 },
+        hylineW36: { 1:70, 5:340, 10:750, 15:1120, 20:1400, 25:1500, 30:1530, 40:1560, 50:1580, 80:1600 },
+        hylineBrown: { 1:75, 5:390, 10:850, 15:1300, 20:1600, 25:1800, 30:1880, 40:1950, 50:1980, 80:2000 },
+        priya: { 1:70, 5:350, 10:780, 15:1150, 20:1400, 25:1500, 30:1550, 40:1600, 50:1620, 80:1650 },
+        ili80: { 1:65, 5:330, 10:720, 15:1050, 20:1300, 25:1450, 30:1480, 40:1500, 50:1520, 80:1550 }
       },
       prod: { 
         bv380: { 18:5, 19:30, 20:55, 21:80, 22:90, 25:96, 30:96, 40:94, 50:90, 60:85, 70:80, 80:75 },
-        babcock: { 18:5, 19:35, 20:65, 21:85, 22:92, 25:96, 30:96, 40:95, 50:91, 60:87, 70:83, 80:78 }
+        bv300: { 18:5, 19:25, 20:50, 21:75, 22:85, 25:95, 30:96, 40:95, 50:92, 60:88, 70:84, 80:80 },
+        hylineW36: { 18:2, 19:20, 20:45, 21:70, 22:82, 25:94, 30:95, 40:94, 50:91, 60:88, 70:85, 80:82 },
+        hylineBrown: { 18:5, 19:35, 20:60, 21:85, 22:92, 25:95, 30:96, 40:95, 50:91, 60:87, 70:85, 80:83 },
+        priya: { 18:5, 19:25, 20:50, 21:75, 22:85, 25:95, 30:96, 40:95, 50:92, 60:88, 70:84, 80:80 },
+        ili80: { 18:2, 19:10, 20:25, 21:50, 22:65, 25:90, 28:92, 40:85, 50:80, 60:75, 70:72, 80:70 }
       }
     }
   };
@@ -737,7 +796,6 @@
     document.getElementById('resultsSection').style.display = 'none';
   }
 
-  // --- SAVE & LOAD FARM RECORD HISTORY ---
   function saveFarmRecord() {
     const mobile = document.getElementById('mobile').value.trim();
     if(!mobile) return alert("Please enter a mobile number to save the record.");
@@ -795,7 +853,6 @@
     }
   }
 
-  // --- DIAGNOSTICS LOGIC ---
   function calculateDiagnostics() {
     const alertBox = document.getElementById('alertBox');
     const varEl = document.getElementById('resVariance');
@@ -891,7 +948,6 @@
     document.getElementById('printFarmTypeLabel').style.display = 'block';
   }
 
-  // Generate .ics file for calendar reminder
   function triggerCalendarReminder() {
     const followUpDays = parseInt(document.getElementById('followUpDays').value) || 7;
     const farmName = document.getElementById('farmName').value || "Farm";
@@ -901,7 +957,6 @@
     const eventDate = new Date();
     eventDate.setDate(eventDate.getDate() + followUpDays);
     
-    // Format to YYYYMMDD
     const formattedDate = eventDate.toISOString().replace(/-|:|\.\d+/g, "").slice(0, 8); 
     
     const icsData = `BEGIN:VCALENDAR
@@ -1024,7 +1079,7 @@ END:VCALENDAR`;
       } else if (p.unit.includes('100birds')) {
          totalUnitsReq = (customDose / 100) * size * days;
       } else {
-         totalUnitsReq = customDose * days; // Raw daily quantity inputted for non-bird units
+         totalUnitsReq = customDose * days; 
       }
       
       let packsNeeded = 0;
