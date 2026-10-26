@@ -439,7 +439,6 @@
                   </tr>
                 </thead>
                 <tbody id="selectedProductsTbody">
-                  <!-- Selected products will appear here -->
                   <tr id="emptyPlannerRow">
                     <td colspan="4" style="text-align:center; padding:30px; color:#94a3b8; font-style:italic;">No products selected yet. Select a product below to add it to the planner.</td>
                   </tr>
@@ -576,23 +575,33 @@
   let currentUser = null;
   let currentFarmType = 'broiler';
   let currentDiagnosticState = {};
-  let selectedProductsList = []; // Keeps track of active products in planner
+  let selectedProductsList = []; 
 
   window.onload = function() {
-    const savedUser = localStorage.getItem('virbac_bo_profile');
-    if (savedUser) {
-      currentUser = JSON.parse(savedUser);
-      showApp();
-    } else {
-      showAuth();
+    // Get profiles array instead of a single object
+    const savedProfiles = JSON.parse(localStorage.getItem('virbac_bo_profiles') || '[]');
+    
+    // If a current_email exists in session storage, use it (for keeping logged in across reloads)
+    const activeEmail = sessionStorage.getItem('active_bo_email');
+    if (activeEmail && savedProfiles.length > 0) {
+       currentUser = savedProfiles.find(p => p.email === activeEmail);
+       if(currentUser) {
+           showApp();
+           initDefaults();
+           return;
+       }
     }
+    showAuth();
+    initDefaults();
+  };
+  
+  function initDefaults() {
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     document.getElementById('visitDate').value = now.toISOString().slice(0,16);
     populateDropdown();
-  };
+  }
 
-  // --- AUTH LOGIC ---
   function showAuth() {
     document.getElementById('appScreen').style.display = 'none';
     document.getElementById('authScreen').style.display = 'block';
@@ -629,24 +638,40 @@
   function register() {
     const profile = {
       name: document.getElementById('regName').value,
-      email: document.getElementById('regEmail').value,
+      email: document.getElementById('regEmail').value.trim(),
       empCode: document.getElementById('regEmpCode').value,
       buUnit: document.getElementById('regBuUnit').value,
       region: document.getElementById('regRegion').value,
       hq: document.getElementById('regHq').value,
     };
-    if(!profile.email || !profile.name) return alert("Name and Email are required.");
+    if(!profile.email || !profile.name) {
+        alert("Name and Email are required.");
+        return;
+    }
     
-    localStorage.setItem('virbac_bo_profile', JSON.stringify(profile));
+    let savedProfiles = JSON.parse(localStorage.getItem('virbac_bo_profiles') || '[]');
+    const existingIndex = savedProfiles.findIndex(p => p.email === profile.email);
+    if(existingIndex >= 0) {
+        savedProfiles[existingIndex] = profile;
+    } else {
+        savedProfiles.push(profile);
+    }
+    
+    localStorage.setItem('virbac_bo_profiles', JSON.stringify(savedProfiles));
+    sessionStorage.setItem('active_bo_email', profile.email);
     currentUser = profile;
     showApp();
   }
 
   function login() {
     const email = document.getElementById('loginEmail').value.trim();
-    const savedUser = JSON.parse(localStorage.getItem('virbac_bo_profile') || '{}');
-    if (email === savedUser.email) {
-      currentUser = savedUser;
+    const savedProfiles = JSON.parse(localStorage.getItem('virbac_bo_profiles') || '[]');
+    
+    const user = savedProfiles.find(p => p.email === email);
+    
+    if (user) {
+      currentUser = user;
+      sessionStorage.setItem('active_bo_email', user.email);
       showApp();
     } else {
       alert("Profile not found on this device. Please register.");
@@ -655,13 +680,12 @@
   }
 
   function logout() {
-    if(confirm("Are you sure you want to remove your profile from this device?")) {
-        localStorage.removeItem('virbac_bo_profile');
+    if(confirm("Are you sure you want to log out?")) {
+        sessionStorage.removeItem('active_bo_email');
         location.reload();
     }
   }
 
-  // --- UI TOGGLES ---
   function setFarmType(type) {
     currentFarmType = type;
     document.getElementById('printFarmType').value = type === 'broiler' ? 'Broiler Farm' : 'Layer Farm';
@@ -681,7 +705,6 @@
     document.getElementById('resultsSection').style.display = 'none';
   }
 
-  // --- DIAGNOSTICS LOGIC ---
   function calculateDiagnostics() {
     const alertBox = document.getElementById('alertBox');
     const varEl = document.getElementById('resVariance');
@@ -776,7 +799,6 @@
     document.getElementById('printFarmTypeLabel').style.display = 'block';
   }
 
-  // --- API / MAILTO NOTIFICATION PROVISION ---
   function triggerMailToReminder() {
     const followUpDays = parseInt(document.getElementById('followUpDays').value) || 7;
     const farmName = document.getElementById('farmName').value || "Farm";
@@ -788,23 +810,11 @@
     const dateString = visitDate.toDateString();
 
     const subject = encodeURIComponent(`Follow-Up Reminder: ${farmName} (${farmerName})`);
-    const body = encodeURIComponent(`Hi ${currentUser.name},
-
-This is your scheduled follow-up reminder for:
-
-Farm: ${farmName}
-Farmer: ${farmerName}
-Contact: ${mobile}
-
-Please check in on the suggested treatment plan.
-
-Automated via Virbac Poultry Connect.`);
+    const body = encodeURIComponent(`Hi ${currentUser.name},\n\nThis is your scheduled follow-up reminder for:\n\nFarm: ${farmName}\nFarmer: ${farmerName}\nContact: ${mobile}\n\nPlease check in on the suggested treatment plan.\n\nAutomated via Virbac Poultry Connect.`);
     
-    // Opens default email client to schedule an email or save as draft
     window.location.href = `mailto:${currentUser.email}?subject=${subject}&body=${body}`;
   }
 
-  // --- DYNAMIC PRODUCT PLANNER ---
   function populateDropdown() {
     const dropdown = document.getElementById('productDropdown');
     products.forEach((p, idx) => {
@@ -828,14 +838,12 @@ Automated via Virbac Poultry Connect.`);
 
     selectedProductsList.push(idx);
     renderSelectedProducts();
-    // Reset dropdown
     dropdown.value = "";
   }
 
   function toggleProductSelection(idx) {
     const el = document.getElementById(`chk_${idx}`);
     if(!el.checked) {
-        // Remove from list
         selectedProductsList = selectedProductsList.filter(i => i !== idx.toString());
         renderSelectedProducts();
     }
