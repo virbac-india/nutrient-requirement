@@ -26,7 +26,6 @@
     }
     * { box-sizing: inherit; }
     
-    /* Top Bar Styling */
     .top-bar {
       background: var(--card-bg);
       padding: 12px 24px;
@@ -41,7 +40,6 @@
     .divider { width: 2px; height: 30px; background-color: var(--border); margin: 0 16px; }
     .app-title { font-size: 18px; font-weight: 700; color: var(--primary); margin: 0; }
     
-    /* Container & Cards */
     .container { max-width: 850px; margin: 20px auto; padding: 0 15px; }
     .card {
       background: var(--card-bg);
@@ -54,7 +52,6 @@
     .card-body { padding: 24px; }
     h2, h3, h4 { color: var(--primary); margin-top: 0; margin-bottom: 15px; }
     
-    /* Auth Card Specifics */
     .auth-header {
       background-color: var(--primary);
       color: white;
@@ -64,11 +61,9 @@
     .auth-header h2 { color: white; margin: 0 0 8px 0; font-size: 24px; }
     .auth-header p { margin: 0; font-size: 14px; opacity: 0.9; }
     
-    /* Grids */
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
     
-    /* Form Inputs */
     .form-group { margin-bottom: 16px; }
     label { font-weight: 600; display: block; margin-bottom: 8px; font-size: 13px; color: #475569; }
     input, select {
@@ -76,12 +71,12 @@
       padding: 12px 14px;
       border: 1px solid var(--border);
       border-radius: 8px;
-      font-size: 16px; /* 16px prevents iOS zoom */
+      font-size: 16px; 
       font-family: inherit;
       background: #fff;
       color: #0f172a;
       transition: all 0.2s;
-      min-height: 44px; /* Touch target size */
+      min-height: 44px;
     }
     input::placeholder { color: #94a3b8; }
     input:focus, select:focus {
@@ -113,7 +108,6 @@
     }
     .radio-btn input { display: none; }
     
-    /* Buttons */
     button {
       background-color: var(--primary);
       color: white;
@@ -142,20 +136,17 @@
     }
     .btn-outline:hover { background-color: #f8fafc; border-color: var(--primary); }
     
-    /* Alerts */
     .alert { padding: 16px; border-radius: 8px; margin: 16px 0; font-size: 14.5px; line-height: 1.6; }
     .alert.success { background: #dcfce7; border: 1px solid #bbf7d0; border-left: 5px solid var(--success); color: #166534; }
     .alert.danger { background: #fef2f2; border: 1px solid #fecaca; border-left: 5px solid var(--warning); color: #991b1b; }
     .pointers-list { margin-top: 10px; padding-left: 20px; }
     .pointers-list li { margin-bottom: 6px; }
     
-    /* Tables */
     .table-responsive { overflow-x: auto; margin-top: 15px; border: 1px solid var(--border); border-radius: 8px; -webkit-overflow-scrolling: touch; }
     table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 600px; }
     th, td { border-bottom: 1px solid var(--border); padding: 12px 16px; text-align: left; vertical-align: middle; }
     th { background-color: #f8fafc; color: #475569; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;}
     
-    /* Profile Banner */
     .profile-banner {
       background: linear-gradient(135deg, #153c8a 0%, #3b82f6 100%);
       color: white;
@@ -169,7 +160,6 @@
     }
     .profile-banner p { margin: 4px 0 0 0; font-size: 14px; opacity: 0.9; line-height: 1.4; }
 
-    /* Custom Checkbox mimicking image */
     .custom-checkbox {
       appearance: none;
       background-color: #fff;
@@ -199,7 +189,6 @@
     .custom-checkbox:checked { background-color: #006aff; border-color: #006aff; }
     .custom-checkbox:checked::before { transform: scale(1); }
 
-    /* Flex Header for Section 3 */
     .section-header-flex {
       display: flex; 
       justify-content: space-between; 
@@ -218,7 +207,15 @@
     .add-product-container select { width: 220px; min-height: 40px; padding: 8px 12px; font-size: 14px; }
     .add-product-container button { width: auto; min-height: 40px; padding: 0 16px; margin: 0; font-size: 14px; }
     
-    /* Screens */
+    #farmHistorySection {
+        background-color: #f8fafc;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 20px;
+        border: 1px solid var(--border);
+        display: none;
+    }
+
     #appScreen, #authScreen, #registerForm, #layerParams, #resultsSection, #costReport { display: none; }
     
     @media (max-width: 700px) {
@@ -232,11 +229,10 @@
       .add-product-container select { flex: 1; width: auto; }
     }
 
-    /* Print / PDF Styles */
     @media print {
       body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .top-bar { position: static; box-shadow: none; border-bottom: 2px solid var(--primary); margin-bottom: 20px; padding: 0 0 10px 0; }
-      button, .no-print, th.col-select, td.col-select, .add-product-container, #print-btn-container { display: none !important; }
+      button, .no-print, th.col-select, td.col-select, .add-product-container, #print-btn-container, #farmHistorySection { display: none !important; }
       .card { box-shadow: none; border: 1px solid var(--border); margin-bottom: 20px; break-inside: avoid; }
       .container { max-width: 100%; margin: 0; padding: 0; }
       input, select { border: none; background: transparent; padding: 0; -webkit-appearance: none; appearance: none; font-weight: bold; color: #000; }
@@ -252,7 +248,6 @@
 </head>
 <body>
 
-  <!-- TOP HEADER -->
   <div class="top-bar">
     <img src="https://in.virbac.com/assets/virbac/build/images/virbac-logo.03fd5e40.svg" alt="Virbac Logo" class="brand-logo">
     <div class="divider"></div>
@@ -261,7 +256,6 @@
 
   <div class="container">
     
-    <!-- AUTHENTICATION SCREEN -->
     <div id="authScreen" class="card no-print">
       <div class="auth-header">
         <h2 id="authTitle">Welcome BO</h2>
@@ -304,10 +298,8 @@
       </div>
     </div>
 
-    <!-- MAIN APP SCREEN -->
     <div id="appScreen">
       
-      <!-- BO Profile Widget -->
       <div class="profile-banner">
         <div>
           <h3 style="color:white; margin:0 0 8px 0;" id="dispBoName">Loading...</h3>
@@ -316,7 +308,6 @@
         <button style="width:auto; margin:0; padding:10px 20px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3);" class="no-print" onclick="logout()">Logout</button>
       </div>
 
-      <!-- Section 1: Customer & Farm Record -->
       <div class="card">
         <div class="card-body">
           <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px;">01. Customer & Farm Record</h3>
@@ -324,10 +315,10 @@
           <label>Select Farm Type *</label>
           <div class="farm-type-selector no-print">
             <label class="radio-btn active" id="btnBroiler" onclick="setFarmType('broiler')">
-              <input type="radio" name="farmType" value="broiler" checked> 🐔 Broiler Farm
+              <input type="radio" name="farmType" value="broiler" checked> &#128036; Broiler Farm
             </label>
             <label class="radio-btn" id="btnLayer" onclick="setFarmType('layer')">
-              <input type="radio" name="farmType" value="layer"> 🥚 Layer Farm
+              <input type="radio" name="farmType" value="layer"> &#129370; Layer Farm
             </label>
           </div>
           <div class="form-group" style="display:none;" id="printFarmTypeLabel">
@@ -338,13 +329,41 @@
           <div class="grid-2">
             <div class="form-group"><label>Farmer Name *</label><input type="text" id="farmerName" placeholder="e.g. Ramesh Babu"></div>
             <div class="form-group"><label>Poultry Farm Name *</label><input type="text" id="farmName" placeholder="e.g. Sri Sai Poultry"></div>
-            <div class="form-group"><label>Mobile / WhatsApp *</label><input type="tel" id="mobile" placeholder="+91 "></div>
+            <div class="form-group">
+                <label>Mobile / WhatsApp *</label>
+                <div style="display:flex; gap:10px;">
+                  <input type="tel" id="mobile" placeholder="+91 " style="flex:1;">
+                  <button class="btn-outline no-print" onclick="checkHistory()" style="margin:0; width:auto; padding:0 15px;">&#128269; History</button>
+                </div>
+            </div>
             <div class="form-group"><label>Visit Date & Time *</label><input type="datetime-local" id="visitDate"></div>
+          </div>
+          
+          <div style="margin-top: 10px;">
+             <button class="btn-secondary no-print" onclick="saveFarmRecord()" style="max-width:250px;">&#128190; Save Record to History</button>
+          </div>
+
+          <div id="farmHistorySection" class="no-print">
+             <h4 style="margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px;">Previous Visits Log</h4>
+             <div class="table-responsive">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Type (Breed)</th>
+                      <th>Age</th>
+                      <th>Observed BW</th>
+                      <th>Variance</th>
+                    </tr>
+                  </thead>
+                  <tbody id="historyTbody">
+                  </tbody>
+                </table>
+             </div>
           </div>
         </div>
       </div>
 
-      <!-- Section 2: Diagnostics -->
       <div class="card">
         <div class="card-body">
           <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px;">02. Flock Diagnostics</h3>
@@ -380,7 +399,6 @@
         </div>
       </div>
 
-      <!-- Section 3: Results & Recommendations -->
       <div id="resultsSection">
         <div class="card">
           <div class="card-body">
@@ -482,7 +500,7 @@
               </table>
             </div>
 
-            <!-- Moved Reminder Section here -->
+            <!-- Reminder Section after Costing -->
             <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-top: 30px;" class="no-print">
               <label style="color: var(--primary);">📅 Self Follow-Up Reminder</label>
               <div class="grid-2" style="align-items: end;">
@@ -491,7 +509,6 @@
                       <input type="number" id="followUpDays" value="7" min="1">
                   </div>
                   <button class="btn-outline no-print" style="margin:0; background: white; border-color: var(--primary);" onclick="triggerCalendarReminder()">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                       Download Calendar Event (.ics)
                   </button>
               </div>
@@ -512,45 +529,48 @@
   </div>
 
 <script>
-  // --- VIRBAC PRODUCT DATABASE ---
+  // --- VIRBAC PRODUCT DATABASE (Strictly from visual aid limits) ---
   const products = [
-    { name: "Calgophos 1 Lit", group: "Mineral", dosePer100: 30, unit: "ml", mrp: 715, packVol: 1000 },
-    { name: "Calgophos 5 Lit", group: "Mineral", dosePer100: 30, unit: "ml", mrp: 3250, packVol: 5000 },
-    { name: "Calgophos 10 Lit", group: "Mineral", dosePer100: 30, unit: "ml", mrp: 6000, packVol: 10000 },
-    { name: "Vitagro 1 Lit", group: "Vitamin", dosePer100: 15, unit: "ml", mrp: 1325, packVol: 1000 },
-    { name: "Brotone Vet 120 ml", group: "Liver", dosePer100: 20, unit: "ml", mrp: 90, packVol: 120 },
-    { name: "Brotone Vet 500 ml", group: "Liver", dosePer100: 20, unit: "ml", mrp: 320, packVol: 500 },
-    { name: "Brotone Vet 5 Ltr", group: "Liver", dosePer100: 20, unit: "ml", mrp: 2400, packVol: 5000 },
-    { name: "Carniforcyl 1 Ltr", group: "Detox", dosePer100: 15, unit: "ml", mrp: 1200, packVol: 1000 },
-    { name: "Carniforcyl 5 Ltr", group: "Detox", dosePer100: 15, unit: "ml", mrp: 5500, packVol: 5000 },
-    { name: "Anabolite-P 2 Lit", group: "Energy", dosePer100: 15, unit: "ml", mrp: 1725, packVol: 2000 },
-    { name: "Anabolite-P 5 Lit", group: "Energy", dosePer100: 15, unit: "ml", mrp: 4100, packVol: 5000 },
-    { name: "Vimeral 120 ml", group: "Anti-stress", dosePer100: 15, unit: "ml", mrp: 200, packVol: 120 },
-    { name: "Vimeral 500 ml", group: "Anti-stress", dosePer100: 15, unit: "ml", mrp: 730, packVol: 500 },
-    { name: "Vimeral Forte 5 Ltr", group: "Anti-stress", dosePer100: 15, unit: "ml", mrp: 7885, packVol: 5000 },
-    { name: "Groviplex S 1 Ltr", group: "B-Complex", dosePer100: 20, unit: "ml", mrp: 260, packVol: 1000 },
-    { name: "Groviplex S 2 Ltr", group: "B-Complex", dosePer100: 20, unit: "ml", mrp: 495, packVol: 2000 },
-    { name: "Vitablend WMF 1 Lit", group: "Vitamin A", dosePer100: 5, unit: "ml", mrp: 3000, packVol: 1000 },
-    { name: "Lixen Powder 300 gm", group: "Antibiotic", dosePer100: 10, unit: "gm", mrp: 1245, packVol: 300 },
-    { name: "Trox 120 gm", group: "CRD", dosePer100: 15, unit: "gm", mrp: 1415, packVol: 120 },
-    { name: "Albomar 500 ml", group: "Dewormer", dosePer100: 30, unit: "ml", mrp: 365, packVol: 500 },
-    { name: "Hitek Orl. Solution 1 Ltr", group: "Endectocide", dosePer100: 25, unit: "ml", mrp: 975, packVol: 1000 },
-    { name: "Clinar 1 Lit", group: "Ectoparasiticide", dosePer100: 10, unit: "ml", mrp: 1190, packVol: 1000 },
-    { name: "Addon Poultry Max 1kg", group: "Gut Health", dosePer100: 100, unit: "gm", mrp: 2140, packVol: 1000 },
-    { name: "Toximar Forte 5 kg", group: "Toxin Binder", dosePer100: 1000, unit: "gm", mrp: 605, packVol: 5000 },
-    { name: "Toximar Forte 20 kg", group: "Toxin Binder", dosePer100: 1000, unit: "gm", mrp: 2550, packVol: 20000 },
-    { name: "Kalzol Forte 10 kg", group: "Calcium", dosePer100: 1500, unit: "gm", mrp: 3000, packVol: 10000 },
-    { name: "Layblend 5 Kg", group: "Premix", dosePer100: 500, unit: "gm", mrp: 2000, packVol: 5000 },
-    { name: "Kohrsolin TH 500 ml", group: "Disinfectant", dosePer100: 30, unit: "ml", mrp: 905, packVol: 500 },
-    { name: "Kohrsolin TH 5 lit", group: "Disinfectant", dosePer100: 30, unit: "ml", mrp: 8350, packVol: 5000 },
-    { name: "Germer 500 ml", group: "Surface Protector", dosePer100: 30, unit: "ml", mrp: 875, packVol: 500 },
-    { name: "Germer 5 Lit", group: "Surface Protector", dosePer100: 30, unit: "ml", mrp: 7575, packVol: 5000 },
-    { name: "Dalguban N PLUS LIVE 2000 D", group: "Vaccine", dosePer100: 1, unit: "vial", mrp: 975, packVol: 1 },
-    { name: "Sokrena W.S 500 ml", group: "Water Sanitizer", dosePer100: 1, unit: "ml", mrp: 600, packVol: 500 },
-    { name: "Sokrena W.S 5 lit", group: "Water Sanitizer", dosePer100: 1, unit: "ml", mrp: 5150, packVol: 5000 },
-    { name: "Olklin W Poultry 500 ML", group: "Water Cleanser", dosePer100: 2, unit: "ml", mrp: 384, packVol: 500 },
-    { name: "Olklin W Poultry 5 LIT", group: "Water Cleanser", dosePer100: 2, unit: "ml", mrp: 3400, packVol: 5000 },
-    { name: "Olklin SW Poultry 500gm", group: "Surface Disinfectant", dosePer100: 5, unit: "gm", mrp: 1500, packVol: 500 }
+    // Nutritionals & Therapeutics
+    { name: "Calgophos 1L", group: "Mineral", dosePer100: 20, unit: "ml/100birds", packVol: 1000 },
+    { name: "Calgophos 5L", group: "Mineral", dosePer100: 20, unit: "ml/100birds", packVol: 5000 },
+    { name: "Vitagro 1L", group: "Vitamin", dosePer100: 15, unit: "ml/100birds", packVol: 1000 },
+    { name: "Brotone vet 2L", group: "Liver", dosePer100: 20, unit: "ml/100birds", packVol: 2000 },
+    { name: "Brotone vet 5L", group: "Liver", dosePer100: 20, unit: "ml/100birds", packVol: 5000 },
+    { name: "Brotone vet 20L", group: "Liver", dosePer100: 20, unit: "ml/100birds", packVol: 20000 },
+    { name: "Carniforcyl 1L", group: "Detox", dosePer100: 15, unit: "ml/100birds", packVol: 1000 },
+    { name: "Carniforcyl 5L", group: "Detox", dosePer100: 15, unit: "ml/100birds", packVol: 5000 },
+    { name: "Anabolite-P 2L", group: "Energy", dosePer100: 15, unit: "ml/100birds", packVol: 2000 },
+    { name: "Anabolite-P 5L", group: "Energy", dosePer100: 15, unit: "ml/100birds", packVol: 5000 },
+    { name: "Vimeral Forte 500ml", group: "Anti-stress", dosePer100: 15, unit: "ml/100birds", packVol: 500 },
+    { name: "Vimeral Forte 2L", group: "Anti-stress", dosePer100: 15, unit: "ml/100birds", packVol: 2000 },
+    { name: "Vimeral Forte 5L", group: "Anti-stress", dosePer100: 15, unit: "ml/100birds", packVol: 5000 },
+    { name: "Groviplex 100gm", group: "B-Complex", dosePer100: 20, unit: "gm/100birds", packVol: 100 },
+    { name: "Groviplex 5L", group: "B-Complex", dosePer100: 20, unit: "ml/100birds", packVol: 5000 },
+    { name: "Vitablend WM Forte 1L", group: "Vitamin A", dosePer100: 5, unit: "ml/100birds", packVol: 1000 },
+    { name: "Lixen 20gm", group: "Antibiotic", dosePer100: 2, unit: "gm/100birds", packVol: 20 },
+    { name: "Lixen 300gm", group: "Antibiotic", dosePer100: 2, unit: "gm/100birds", packVol: 300 },
+    { name: "Trox 120gm", group: "CRD", dosePer100: 10, unit: "gm/100birds", packVol: 120 },
+    { name: "Albomar Powder 500gm", group: "Dewormer", dosePer100: 33, unit: "gm/100birds", packVol: 500 },
+    { name: "Hitek Oral 2L", group: "Endectocide", dosePer100: 25, unit: "ml/100birds", packVol: 2000 },
+    { name: "Virtraz 500ml", group: "Ectoparasiticide", dosePer100: 5, unit: "ml/L water", packVol: 500 },
+    { name: "Clinar 1L", group: "Ectoparasiticide", dosePer100: 10, unit: "ml/L water", packVol: 1000 },
+    { name: "Addon Poultry Max 1kg", group: "Gut Health", dosePer100: 150, unit: "gm/Ton feed", packVol: 1000 },
+    { name: "Toximar Forte 20kg", group: "Toxin Binder", dosePer100: 1000, unit: "gm/Ton feed", packVol: 20000 },
+    { name: "Groblend Forte 20kg", group: "Premix", dosePer100: 1333, unit: "gm/Ton feed", packVol: 20000 },
+    { name: "Kalzol Forte 10kg", group: "Calcium", dosePer100: 1000, unit: "gm/Ton feed", packVol: 10000 },
+    { name: "Layblend 5kg", group: "Premix", dosePer100: 5000, unit: "gm/Ton feed", packVol: 5000 },
+    // Biologicals & Disinfectants
+    { name: "Kohrsolin TH 500ml", group: "Disinfectant", dosePer100: 30, unit: "ml/L water", packVol: 500 },
+    { name: "Kohrsolin TH 5L", group: "Disinfectant", dosePer100: 30, unit: "ml/L water", packVol: 5000 },
+    { name: "Germer 500ml", group: "Surface Protector", dosePer100: 5, unit: "ml/L water", packVol: 500 },
+    { name: "Germer 5L", group: "Surface Protector", dosePer100: 5, unit: "ml/L water", packVol: 5000 },
+    { name: "Sokrena-WS 500ml", group: "Water Sanitizer", dosePer100: 1, unit: "ml/10L water", packVol: 500 },
+    { name: "Sokrena-WS 5L", group: "Water Sanitizer", dosePer100: 1, unit: "ml/10L water", packVol: 5000 },
+    { name: "Olklin-W 500ml", group: "Water Cleanser", dosePer100: 2, unit: "ml/10L water", packVol: 500 },
+    { name: "Olklin-W 5L", group: "Water Cleanser", dosePer100: 2, unit: "ml/10L water", packVol: 5000 },
+    { name: "Olklin-SW 500gm", group: "Surface Disinfectant", dosePer100: 5, unit: "gm/L water", packVol: 500 },
+    { name: "Dalguban N+ Live (2000 D)", group: "Vaccine", dosePer100: 1, unit: "vial/2000 birds", packVol: 1 }
   ];
 
   // --- STANDARD RUNNING METRICS (Interpolated for exact days/weeks) ---
@@ -717,6 +737,65 @@
     document.getElementById('resultsSection').style.display = 'none';
   }
 
+  // --- SAVE & LOAD FARM RECORD HISTORY ---
+  function saveFarmRecord() {
+    const mobile = document.getElementById('mobile').value.trim();
+    if(!mobile) return alert("Please enter a mobile number to save the record.");
+    
+    const record = {
+      date: document.getElementById('visitDate').value,
+      farmerName: document.getElementById('farmerName').value,
+      farmName: document.getElementById('farmName').value,
+      type: currentFarmType,
+      breed: currentFarmType === 'broiler' ? document.getElementById('broilerBreed').options[document.getElementById('broilerBreed').selectedIndex].text : document.getElementById('layerBreed').options[document.getElementById('layerBreed').selectedIndex].text,
+      age: currentFarmType === 'broiler' ? document.getElementById('broilerAge').value : document.getElementById('layerAge').value,
+      size: currentFarmType === 'broiler' ? document.getElementById('broilerSize').value : document.getElementById('layerSize').value,
+      actualBW: currentFarmType === 'broiler' ? document.getElementById('broilerBW').value : document.getElementById('layerBW').value,
+      variance: currentDiagnosticState.variance !== undefined ? currentDiagnosticState.variance.toFixed(0) : "N/A"
+    };
+
+    let history = JSON.parse(localStorage.getItem('virbac_farm_history') || '{}');
+    if(!history[mobile]) history[mobile] = [];
+    history[mobile].push(record);
+    
+    localStorage.setItem('virbac_farm_history', JSON.stringify(history));
+    alert("Farm record saved successfully!");
+    checkHistory(); 
+  }
+
+  function checkHistory() {
+    const mobile = document.getElementById('mobile').value.trim();
+    const historyDiv = document.getElementById('farmHistorySection');
+    const tbody = document.getElementById('historyTbody');
+    
+    if(!mobile) {
+       alert("Enter a mobile number first to load history.");
+       return;
+    }
+    
+    let history = JSON.parse(localStorage.getItem('virbac_farm_history') || '{}');
+    if(history[mobile] && history[mobile].length > 0) {
+      historyDiv.style.display = 'block';
+      tbody.innerHTML = '';
+      
+      const reversed = [...history[mobile]].reverse();
+      reversed.forEach(rec => {
+         const d = new Date(rec.date).toLocaleDateString();
+         tbody.innerHTML += `<tr>
+           <td>${d}</td>
+           <td><small>${rec.type.toUpperCase()}</small><br/>${rec.breed}</td>
+           <td>${rec.age}</td>
+           <td>${rec.actualBW}g</td>
+           <td>${rec.variance !== "N/A" ? (rec.variance > 0 ? '+'+rec.variance : rec.variance) + 'g' : '-'}</td>
+         </tr>`;
+      });
+    } else {
+      alert("No previous records found for this mobile number.");
+      historyDiv.style.display = 'none';
+    }
+  }
+
+  // --- DIAGNOSTICS LOGIC ---
   function calculateDiagnostics() {
     const alertBox = document.getElementById('alertBox');
     const varEl = document.getElementById('resVariance');
@@ -754,7 +833,7 @@
             </ul>
             <em>Select supportive therapies below to formulate a rapid recovery plan.</em>`;
         }
-        currentDiagnosticState = { size };
+        currentDiagnosticState = { size, variance };
         
     } else {
         const breed = document.getElementById('layerBreed').value;
@@ -805,7 +884,7 @@
             </ul>
             <em>Select supportive therapies below to formulate a recovery plan.</em>`;
         }
-        currentDiagnosticState = { size };
+        currentDiagnosticState = { size, variance: varianceBW };
     }
 
     document.getElementById('resultsSection').style.display = 'block';
@@ -851,7 +930,7 @@ END:VCALENDAR`;
     products.forEach((p, idx) => {
       const option = document.createElement('option');
       option.value = idx;
-      option.text = p.name; // Removed MRP from text as per request
+      option.text = p.name;
       dropdown.add(option);
     });
   }
@@ -899,7 +978,7 @@ END:VCALENDAR`;
           <td>
             <div style="display:flex; align-items:center; gap:8px;">
                 <input type="number" id="dose_${idx}" value="${p.dosePer100}" class="print-input" onchange="this.setAttribute('value', this.value)" style="width:70px; padding:6px; font-size:14px; min-height:30px;">
-                <span style="font-size:13px; color:#475569;">${p.unit}/100birds</span>
+                <span style="font-size:13px; color:#475569;">${p.unit}</span>
             </div>
           </td>
           <td>
@@ -937,17 +1016,19 @@ END:VCALENDAR`;
           hasEmptyPrice = true;
       }
       
-      const customPrice = parseFloat(customPriceVal) || 0; // fallback to 0 if empty just to continue math if ignored
+      const customPrice = parseFloat(customPriceVal) || 0; 
       
       let totalUnitsReq = 0;
-      if(p.unit === 'vial') {
-         totalUnitsReq = Math.ceil(size / 2000); 
-      } else {
+      if (p.unit.includes('vial')) {
+         totalUnitsReq = Math.ceil(size / 2000) * days; 
+      } else if (p.unit.includes('100birds')) {
          totalUnitsReq = (customDose / 100) * size * days;
+      } else {
+         totalUnitsReq = customDose * days; // Raw daily quantity inputted for non-bird units
       }
       
       let packsNeeded = 0;
-      if (p.unit === 'vial') packsNeeded = totalUnitsReq;
+      if (p.unit.includes('vial')) packsNeeded = totalUnitsReq;
       else packsNeeded = Math.ceil(totalUnitsReq / p.packVol);
 
       const rowCost = packsNeeded * customPrice;
@@ -956,12 +1037,11 @@ END:VCALENDAR`;
       const costPerBirdPerDay = rowCost / size / days;
       totalCostPerBirdDay += costPerBirdPerDay;
 
-      let displayUnit = "";
-      if(p.unit === 'vial') displayUnit = totalUnitsReq + " Vials";
-      else displayUnit = totalUnitsReq > 1000 ? (totalUnitsReq/1000).toFixed(2) + (p.unit==='ml'?' L':' kg') : totalUnitsReq.toFixed(0) + " " + p.unit;
-
-      let packDisplay = (p.packVol >= 1000 ? p.packVol/1000 + (p.unit==='ml'?'L':'kg') : p.packVol + p.unit);
-      if(p.unit === 'vial') packDisplay = "1 Vial";
+      let displayUnit = totalUnitsReq > 1000 ? (totalUnitsReq/1000).toFixed(2) + (p.unit.includes('ml')?' L':' kg') : totalUnitsReq.toFixed(0) + (p.unit.includes('ml')?' ml':' gm');
+      if (p.unit.includes('vial')) displayUnit = totalUnitsReq + " Vials";
+      
+      let packDisplay = (p.packVol >= 1000 ? p.packVol/1000 + (p.unit.includes('ml')?'L':'kg') : p.packVol + (p.unit.includes('ml')?'ml':'gm'));
+      if(p.unit.includes('vial')) packDisplay = "1 Vial";
 
       tbody.innerHTML += `
         <tr>
