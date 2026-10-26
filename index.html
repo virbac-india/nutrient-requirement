@@ -126,6 +126,10 @@
       transition: background 0.2s;
       width: 100%;
       min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
     button:hover { background-color: #0f2a63; }
     .btn-secondary { background-color: var(--secondary); }
@@ -149,7 +153,7 @@
     .table-responsive { overflow-x: auto; margin-top: 15px; border: 1px solid var(--border); border-radius: 8px; -webkit-overflow-scrolling: touch; }
     table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 600px; }
     th, td { border-bottom: 1px solid var(--border); padding: 12px 16px; text-align: left; vertical-align: middle; }
-    th { background-color: #f8fafc; color: #475569; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;}
+    th { background-color: #f8fafc; color: #475569; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;}
     
     /* Profile Banner */
     .profile-banner {
@@ -164,6 +168,55 @@
       box-shadow: 0 4px 12px rgba(21, 60, 138, 0.2);
     }
     .profile-banner p { margin: 4px 0 0 0; font-size: 14px; opacity: 0.9; line-height: 1.4; }
+
+    /* Custom Checkbox mimicking image */
+    .custom-checkbox {
+      appearance: none;
+      background-color: #fff;
+      margin: 0;
+      font: inherit;
+      color: currentColor;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      display: grid;
+      place-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .custom-checkbox::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      transform: scale(0);
+      transition: 120ms transform ease-in-out;
+      box-shadow: inset 1em 1em white;
+      background-color: Transform;
+      transform-origin: bottom left;
+      clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+    }
+    .custom-checkbox:checked {
+      background-color: #006aff;
+      border-color: #006aff;
+    }
+    .custom-checkbox:checked::before {
+      transform: scale(1);
+    }
+
+    /* Add Product Dropdown */
+    .add-product-container {
+      margin-top: 15px;
+      padding: 15px;
+      background-color: #f8fafc;
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .add-product-container select { flex: 1; }
+    .add-product-container button { width: auto; min-height: 44px; padding: 0 20px; margin: 0; }
     
     /* Screens */
     #appScreen, #authScreen, #registerForm, #layerParams, #resultsSection, #costReport { display: none; }
@@ -174,13 +227,15 @@
       .card-body { padding: 16px; }
       .brand-logo { height: 24px; }
       .app-title { font-size: 16px; }
+      .add-product-container { flex-direction: column; align-items: stretch; }
+      .add-product-container button { width: 100%; }
     }
 
     /* Print / PDF Styles */
     @media print {
       body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .top-bar { position: static; box-shadow: none; border-bottom: 2px solid var(--primary); margin-bottom: 20px; padding: 0 0 10px 0; }
-      button, .no-print, input[type="checkbox"], th:first-child, td:first-child { display: none !important; }
+      button, .no-print, th.col-select, td.col-select, .add-product-container, #print-btn-container { display: none !important; }
       .card { box-shadow: none; border: 1px solid var(--border); margin-bottom: 20px; break-inside: avoid; }
       .container { max-width: 100%; margin: 0; padding: 0; }
       input, select { border: none; background: transparent; padding: 0; -webkit-appearance: none; appearance: none; font-weight: bold; color: #000; }
@@ -264,7 +319,6 @@
               <input type="radio" name="farmType" value="layer"> 🥚 Layer Farm
             </label>
           </div>
-          <!-- Print visible farm type -->
           <div class="form-group" style="display:none;" id="printFarmTypeLabel">
              <label>Farm Type</label>
              <input type="text" id="printFarmType" readonly>
@@ -277,20 +331,22 @@
             <div class="form-group"><label>Visit Date & Time *</label><input type="datetime-local" id="visitDate"></div>
           </div>
 
-          <!-- Automated Email Reminder API Setup -->
+          <!-- Schedule reminder using standard "mailto" protocol (No Zapier needed) -->
           <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-top: 15px;">
-            <label style="color: var(--primary);">📧 Setup Automated Follow-Up Email Reminder</label>
+            <label style="color: var(--primary);">📧 Setup Offline Calendar/Email Reminder</label>
             <div class="grid-2" style="align-items: end;">
                 <div class="form-group" style="margin-bottom:0;">
                     <label>Remind me after (Days) *</label>
                     <input type="number" id="followUpDays" value="7" min="1">
                 </div>
-                <button class="btn-outline no-print" style="margin:0; background: white;" onclick="triggerReminderAPI()">Schedule Reminder</button>
+                <button class="btn-outline no-print" style="margin:0; background: white; border-color: var(--primary);" onclick="triggerMailToReminder()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    Add to Calendar/Email
+                </button>
             </div>
             <small class="no-print" style="color:#64748b; margin-top:8px; display:block;">
-                * This sends an API webhook to trigger an automated email to your registered BO email address (via your backend integration like Zapier/Make) on the specified date.
+                * This will open your default email/calendar app to schedule a secure offline reminder.
             </small>
-            <small style="color:#16a34a; font-weight:bold; display:none; margin-top:10px;" id="reminderSuccessMsg">✓ Reminder successfully scheduled!</small>
           </div>
 
         </div>
@@ -301,7 +357,6 @@
         <div class="card-body">
           <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px;">02. Flock Diagnostics</h3>
           
-          <!-- Broiler Parameters -->
           <div id="broilerParams" class="grid-2">
             <div class="form-group">
               <label>Broiler Breed</label>
@@ -315,7 +370,6 @@
             <div class="form-group"><label>Observed Avg. Weight (grams)</label><input type="number" id="broilerBW" value="850"></div>
           </div>
 
-          <!-- Layer Parameters -->
           <div id="layerParams" class="grid-2">
             <div class="form-group">
               <label>Layer Breed</label>
@@ -354,7 +408,6 @@
               </div>
             </div>
             
-            <!-- Layer Specific Production Metric -->
             <div id="layerProdBox" class="grid-2" style="display:none; margin-top:15px;">
                 <div style="background:#f8fafc; padding:15px; border-radius:8px; border: 1px solid var(--border); text-align:center;">
                     <span style="font-size:12px; color:#64748b; text-transform: uppercase; font-weight:600;">Target Egg Prod.</span>
@@ -379,14 +432,30 @@
               <table id="plannerTable">
                 <thead>
                   <tr>
-                    <th style="width: 50px; text-align:center;">Select</th>
+                    <th class="col-select" style="width: 50px; text-align:center;">Select</th>
                     <th>Product & Pack</th>
                     <th>Standard Dose Rate</th>
                     <th>MRP (₹)</th>
                   </tr>
                 </thead>
-                <tbody id="productTbody"></tbody>
+                <tbody id="selectedProductsTbody">
+                  <!-- Selected products will appear here -->
+                  <tr id="emptyPlannerRow">
+                    <td colspan="4" style="text-align:center; padding:30px; color:#94a3b8; font-style:italic;">No products selected yet. Select a product below to add it to the planner.</td>
+                  </tr>
+                </tbody>
               </table>
+            </div>
+
+            <div class="add-product-container">
+              <select id="productDropdown">
+                <option value="" disabled selected>-- Select a Product to Add --</option>
+                <!-- Populated dynamically -->
+              </select>
+              <button class="btn-outline" onclick="addProductToPlanner()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Add Product
+              </button>
             </div>
             
             <div class="form-group" style="margin-top:20px; max-width: 300px;">
@@ -413,10 +482,17 @@
                   </tr>
                 </thead>
                 <tbody id="costTbody"></tbody>
+                <tfoot>
+                  <tr style="background-color: #f8fafc; font-weight: 700;">
+                    <td colspan="4" style="text-align: right; color: var(--primary);">Total Estimated Cost:</td>
+                    <td style="color: var(--primary); font-size: 16px;" id="totalCostCell">₹0</td>
+                    <td></td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
             
-            <div class="no-print" style="margin-top:30px; text-align:center; padding-top: 20px; border-top: 1px solid var(--border);">
+            <div id="print-btn-container" class="no-print" style="margin-top:30px; text-align:center; padding-top: 20px; border-top: 1px solid var(--border);">
               <p style="color:#64748b; font-size:14px; margin-bottom:15px;">Review the details above. Click below to save a professional copy for your records or share with the farmer.</p>
               <button style="max-width:350px; width:100%; font-size: 16px; padding: 14px;" onclick="window.print()">🖨️ Save Report as PDF</button>
             </div>
@@ -475,7 +551,7 @@
       ross308: { 0:42, 7:205, 14:494, 21:959, 28:1597, 35:2382, 42:3252, 49:4141, 56:5000 },
       cobb500: { 0:42, 7:204, 14:496, 21:963, 28:1603, 35:2395, 42:3286, 49:4216, 56:5100 }
     },
-    layer: { // Typical Commercial Brown (e.g. BV380) weekly targets
+    layer: {
       weight: { 1:75, 5:390, 10:840, 15:1250, 20:1600, 25:1750, 30:1850, 40:1900, 50:1920, 80:1950 },
       prod: { 18:5, 19:30, 20:55, 21:80, 22:90, 25:96, 30:96, 40:94, 50:90, 60:85, 70:80, 80:75 }
     }
@@ -490,7 +566,6 @@
         if(inputPoint >= keys[i] && inputPoint <= keys[i+1]) {
             const x0 = keys[i], y0 = dataset[x0];
             const x1 = keys[i+1], y1 = dataset[x1];
-            // Linear interpolation
             return y0 + (y1 - y0) * ((inputPoint - x0) / (x1 - x0));
         }
     }
@@ -501,6 +576,7 @@
   let currentUser = null;
   let currentFarmType = 'broiler';
   let currentDiagnosticState = {};
+  let selectedProductsList = []; // Keeps track of active products in planner
 
   window.onload = function() {
     const savedUser = localStorage.getItem('virbac_bo_profile');
@@ -513,7 +589,7 @@
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     document.getElementById('visitDate').value = now.toISOString().slice(0,16);
-    populateProductTable();
+    populateDropdown();
   };
 
   // --- AUTH LOGIC ---
@@ -602,7 +678,6 @@
         document.getElementById('layerParams').style.display = 'grid';
         document.getElementById('broilerParams').style.display = 'none';
     }
-    // reset results
     document.getElementById('resultsSection').style.display = 'none';
   }
 
@@ -627,7 +702,7 @@
         document.getElementById('resObserved').innerText = actBW + ' g';
         varEl.innerText = (variance > 0 ? '+' : '') + variance.toFixed(0) + ' g';
 
-        if (variance >= -10) { // small buffer for 'good'
+        if (variance >= -10) { 
             varEl.style.color = 'var(--success)';
             alertBox.className = 'alert success';
             alertBox.innerHTML = `<strong>🌟 Excellent Management!</strong> The broiler flock is matching or exceeding standard ${breed.toUpperCase()} running benchmarks. Continue standard maintenance protocols. Ensure gut health with Addon Poultry Max to sustain performance.`;
@@ -647,8 +722,7 @@
         currentDiagnosticState = { size };
         
     } else {
-        // LAYER
-        const age = parseInt(document.getElementById('layerAge').value); // in WEEKS
+        const age = parseInt(document.getElementById('layerAge').value); 
         const size = parseInt(document.getElementById('layerSize').value);
         const actBW = parseFloat(document.getElementById('layerBW').value);
         const actProd = parseFloat(document.getElementById('layerProd').value);
@@ -670,7 +744,6 @@
         if(age >= 18) {
             document.getElementById('layerProdBox').style.display = 'grid';
             document.getElementById('resTargetProd').innerText = targetProd.toFixed(1) + '%';
-            
             const prodVarEl = document.getElementById('resProdVariance');
             prodVarEl.innerText = (varianceProd > 0 ? '+' : '') + varianceProd.toFixed(1) + '%';
             prodVarEl.style.color = varianceProd >= -2 ? 'var(--success)' : 'var(--warning)';
@@ -678,7 +751,6 @@
             document.getElementById('layerProdBox').style.display = 'none';
         }
 
-        // Determine Layer Alert
         if (varianceBW >= -20 && varianceProd >= -3) {
             varEl.style.color = 'var(--success)';
             alertBox.className = 'alert success';
@@ -701,31 +773,89 @@
     }
 
     document.getElementById('resultsSection').style.display = 'block';
-    // Hide print farm label until actually printing, we handle that via media queries but let's toggle inline style
     document.getElementById('printFarmTypeLabel').style.display = 'block';
   }
 
-  // --- API / NOTIFICATION PROVISION ---
-  function triggerReminderAPI() {
-    const followUpDays = document.getElementById('followUpDays').value;
-    const msg = document.getElementById('reminderSuccessMsg');
+  // --- API / MAILTO NOTIFICATION PROVISION ---
+  function triggerMailToReminder() {
+    const followUpDays = parseInt(document.getElementById('followUpDays').value) || 7;
+    const farmName = document.getElementById('farmName').value || "Farm";
+    const farmerName = document.getElementById('farmerName').value || "Farmer";
+    const mobile = document.getElementById('mobile').value || "";
     
-    // In a real environment, this makes a fetch() call to a backend webhook
-    // e.g., fetch('https://hook.eu1.make.com/xxxx', { method: 'POST', body: JSON.stringify({...}) })
-    // For this client-side demo, we simulate the success response.
+    const visitDate = new Date();
+    visitDate.setDate(visitDate.getDate() + followUpDays);
+    const dateString = visitDate.toDateString();
+
+    const subject = encodeURIComponent(`Follow-Up Reminder: ${farmName} (${farmerName})`);
+    const body = encodeURIComponent(`Hi ${currentUser.name},
+
+This is your scheduled follow-up reminder for:
+
+Farm: ${farmName}
+Farmer: ${farmerName}
+Contact: ${mobile}
+
+Please check in on the suggested treatment plan.
+
+Automated via Virbac Poultry Connect.`);
     
-    msg.style.display = 'block';
-    setTimeout(() => { msg.style.display = 'none'; }, 4000);
+    // Opens default email client to schedule an email or save as draft
+    window.location.href = `mailto:${currentUser.email}?subject=${subject}&body=${body}`;
   }
 
-  // --- COST CALCULATOR ---
-  function populateProductTable() {
-    const tbody = document.getElementById('productTbody');
-    tbody.innerHTML = '';
+  // --- DYNAMIC PRODUCT PLANNER ---
+  function populateDropdown() {
+    const dropdown = document.getElementById('productDropdown');
     products.forEach((p, idx) => {
+      const option = document.createElement('option');
+      option.value = idx;
+      option.text = `${p.name} (MRP: ₹${p.mrp})`;
+      dropdown.add(option);
+    });
+  }
+
+  function addProductToPlanner() {
+    const dropdown = document.getElementById('productDropdown');
+    const idx = dropdown.value;
+    
+    if(idx === "") return;
+    
+    if(selectedProductsList.includes(idx)) {
+        alert("This product is already added.");
+        return;
+    }
+
+    selectedProductsList.push(idx);
+    renderSelectedProducts();
+    // Reset dropdown
+    dropdown.value = "";
+  }
+
+  function toggleProductSelection(idx) {
+    const el = document.getElementById(`chk_${idx}`);
+    if(!el.checked) {
+        // Remove from list
+        selectedProductsList = selectedProductsList.filter(i => i !== idx.toString());
+        renderSelectedProducts();
+    }
+  }
+
+  function renderSelectedProducts() {
+    const tbody = document.getElementById('selectedProductsTbody');
+    if(selectedProductsList.length === 0) {
+        tbody.innerHTML = `<tr id="emptyPlannerRow"><td colspan="4" style="text-align:center; padding:30px; color:#94a3b8; font-style:italic;">No products selected yet. Select a product below to add it to the planner.</td></tr>`;
+        return;
+    }
+    
+    tbody.innerHTML = '';
+    selectedProductsList.forEach(idx => {
+      const p = products[idx];
       tbody.innerHTML += `
         <tr>
-          <td style="text-align:center;"><input type="checkbox" class="prod-checkbox" value="${idx}" style="width:18px; height:18px; cursor:pointer;"></td>
+          <td class="col-select" style="text-align:center;">
+             <input type="checkbox" id="chk_${idx}" class="custom-checkbox prod-checkbox" value="${idx}" checked onclick="toggleProductSelection('${idx}')">
+          </td>
           <td><b>${p.name}</b><br><small style="color:#64748b;">${p.group}</small></td>
           <td>
             <div style="display:flex; align-items:center; gap:8px;">
@@ -748,7 +878,7 @@
     tbody.innerHTML = '';
     
     const checkboxes = document.querySelectorAll('.prod-checkbox:checked');
-    if (checkboxes.length === 0) return alert("Select at least one product to generate a cost report.");
+    if (checkboxes.length === 0) return alert("Add and select at least one product to generate a cost report.");
 
     let totalCost = 0;
 
@@ -790,6 +920,7 @@
       `;
     });
 
+    document.getElementById('totalCostCell').innerText = `₹${totalCost.toLocaleString()}`;
     document.getElementById('costReport').style.display = 'block';
   }
 </script>
