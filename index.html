@@ -2,425 +2,796 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nutrient Requirement Diagnostic System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Poultry Connect | Virbac</title>
   <style>
     :root {
-      --primary: #1e3a8a;
+      --primary: #153c8a; /* Virbac Blue */
       --secondary: #059669;
       --warning: #dc2626;
-      --bg: #f8fafc;
+      --success: #16a34a;
+      --bg: #f4f7f9;
       --card-bg: #ffffff;
-      --text: #0f172a;
+      --text: #334155;
+      --border: #e2e8f0;
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: var(--bg);
       color: var(--text);
       margin: 0;
-      padding: 12px;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
     }
-    .container {
-      max-width: 850px;
-      margin: 0 auto;
+    * { box-sizing: inherit; }
+    
+    /* Top Bar Styling */
+    .top-bar {
+      background: var(--card-bg);
+      padding: 12px 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
+    .brand-logo { height: 28px; width: auto; }
+    .divider { width: 2px; height: 30px; background-color: var(--border); margin: 0 16px; }
+    .app-title { font-size: 18px; font-weight: 700; color: var(--primary); margin: 0; }
+    
+    /* Container & Cards */
+    .container { max-width: 850px; margin: 20px auto; padding: 0 15px; }
     .card {
       background: var(--card-bg);
       border-radius: 12px;
-      padding: 18px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      margin-bottom: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      margin-bottom: 24px;
+      overflow: hidden;
+      border: 1px solid #f1f5f9;
     }
-    .logo-container {
-      display: flex;
-      align-items: center;
-      margin-bottom: 14px;
-    }
-    .brand-logo {
-      height: 38px;
-      width: auto;
-    }
-    h1.main-title {
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--primary);
-      margin: 20px 0 4px 0;
-      letter-spacing: -0.5px;
-      text-align: center;
-    }
-    h2, h3, h4 {
-      margin-top: 0;
-      color: var(--primary);
-    }
-    .sub-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #334155;
-      margin-bottom: 14px;
-    }
-    label {
-      font-weight: 600;
-      display: block;
-      margin-top: 12px;
-      font-size: 14px;
-    }
-    select, input, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 6px;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      box-sizing: border-box;
-      font-size: 16px;
-    }
-    button {
-      background-color: var(--secondary);
+    .card-body { padding: 24px; }
+    h2, h3, h4 { color: var(--primary); margin-top: 0; margin-bottom: 15px; }
+    
+    /* Auth Card Specifics */
+    .auth-header {
+      background-color: var(--primary);
       color: white;
-      font-weight: 700;
-      border: none;
-      margin-top: 18px;
+      text-align: center;
+      padding: 30px 20px;
+    }
+    .auth-header h2 { color: white; margin: 0 0 8px 0; font-size: 24px; }
+    .auth-header p { margin: 0; font-size: 14px; opacity: 0.9; }
+    
+    /* Grids */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
+    
+    /* Form Inputs */
+    .form-group { margin-bottom: 16px; }
+    label { font-weight: 600; display: block; margin-bottom: 8px; font-size: 13px; color: #475569; }
+    input, select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 16px; /* 16px prevents iOS zoom */
+      font-family: inherit;
+      background: #fff;
+      color: #0f172a;
+      transition: all 0.2s;
+      min-height: 44px; /* Touch target size */
+    }
+    input::placeholder { color: #94a3b8; }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(21, 60, 138, 0.1);
+    }
+
+    .farm-type-selector {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .radio-btn {
+      flex: 1;
+      text-align: center;
+      padding: 12px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
       cursor: pointer;
-      transition: background 0.2s;
-    }
-    button:hover {
-      background-color: #047857;
-    }
-    .stage-badge-container {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-    }
-    .badge {
-      background: #e2e8f0;
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 12px;
       font-weight: 600;
-      color: #334155;
+      color: var(--text);
+      transition: all 0.2s;
     }
-    .badge.active {
-      background: #1e3a8a;
-      color: white;
-    }
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 12px;
-      margin-top: 12px;
-    }
-    .metric-box {
-      background: #f1f5f9;
-      padding: 12px;
-      border-radius: 8px;
-      text-align: center;
-    }
-    .metric-box label {
-      font-size: 12px;
-      color: #64748b;
-      margin: 0;
-    }
-    .metric-box .val {
-      font-size: 20px;
-      font-weight: 700;
+    .radio-btn.active {
+      border-color: var(--primary);
+      background-color: rgba(21, 60, 138, 0.05);
       color: var(--primary);
-      margin-top: 4px;
     }
-    .metric-box.danger .val {
-      color: var(--warning);
-    }
-    .table-container {
-      overflow-x: auto;
-      margin-top: 12px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-    th, td {
-      border: 1px solid #e2e8f0;
-      padding: 10px;
-      text-align: left;
-    }
-    th {
-      background-color: #1e293b;
+    .radio-btn input { display: none; }
+    
+    /* Buttons */
+    button {
+      background-color: var(--primary);
       color: white;
-    }
-    tr:nth-child(even) {
-      background-color: #f8fafc;
-    }
-    .alert {
-      padding: 12px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      padding: 14px;
       border-radius: 8px;
-      background-color: #fef2f2;
-      border-left: 4px solid var(--warning);
-      color: #991b1b;
+      font-size: 16px;
+      transition: background 0.2s;
+      width: 100%;
+      min-height: 48px;
+    }
+    button:hover { background-color: #0f2a63; }
+    .btn-secondary { background-color: var(--secondary); }
+    .btn-secondary:hover { background-color: #047857; }
+    .btn-outline {
+      background-color: transparent;
+      color: var(--primary);
+      border: 1px solid var(--border);
       margin-top: 12px;
-      font-size: 14px;
+    }
+    .btn-outline:hover { background-color: #f8fafc; border-color: var(--primary); }
+    
+    /* Alerts */
+    .alert { padding: 16px; border-radius: 8px; margin: 16px 0; font-size: 14.5px; line-height: 1.6; }
+    .alert.success { background: #dcfce7; border: 1px solid #bbf7d0; border-left: 5px solid var(--success); color: #166534; }
+    .alert.danger { background: #fef2f2; border: 1px solid #fecaca; border-left: 5px solid var(--warning); color: #991b1b; }
+    .pointers-list { margin-top: 10px; padding-left: 20px; }
+    .pointers-list li { margin-bottom: 6px; }
+    
+    /* Tables */
+    .table-responsive { overflow-x: auto; margin-top: 15px; border: 1px solid var(--border); border-radius: 8px; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 600px; }
+    th, td { border-bottom: 1px solid var(--border); padding: 12px 16px; text-align: left; vertical-align: middle; }
+    th { background-color: #f8fafc; color: #475569; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;}
+    
+    /* Profile Banner */
+    .profile-banner {
+      background: linear-gradient(135deg, #153c8a 0%, #3b82f6 100%);
+      color: white;
+      padding: 20px 24px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(21, 60, 138, 0.2);
+    }
+    .profile-banner p { margin: 4px 0 0 0; font-size: 14px; opacity: 0.9; line-height: 1.4; }
+    
+    /* Screens */
+    #appScreen, #authScreen, #registerForm, #layerParams, #resultsSection, #costReport { display: none; }
+    
+    @media (max-width: 600px) {
+      .grid-2 { grid-template-columns: 1fr; gap: 10px; }
+      .profile-banner { flex-direction: column; align-items: flex-start; gap: 15px; }
+      .card-body { padding: 16px; }
+      .brand-logo { height: 24px; }
+      .app-title { font-size: 16px; }
+    }
+
+    /* Print / PDF Styles */
+    @media print {
+      body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .top-bar { position: static; box-shadow: none; border-bottom: 2px solid var(--primary); margin-bottom: 20px; padding: 0 0 10px 0; }
+      button, .no-print, input[type="checkbox"], th:first-child, td:first-child { display: none !important; }
+      .card { box-shadow: none; border: 1px solid var(--border); margin-bottom: 20px; break-inside: avoid; }
+      .container { max-width: 100%; margin: 0; padding: 0; }
+      input, select { border: none; background: transparent; padding: 0; -webkit-appearance: none; appearance: none; font-weight: bold; color: #000; }
+      .profile-banner { background: #f1f5f9 !important; color: #000 !important; border: 1px solid var(--border); box-shadow: none; }
+      .profile-banner h3 { color: var(--primary) !important; }
+      .profile-banner p { color: #334155 !important; }
+      .alert.danger { background: #fef2f2 !important; border-left: 4px solid var(--warning) !important; }
+      .alert.success { background: #dcfce7 !important; border-left: 4px solid var(--success) !important; }
+      .table-responsive { overflow-x: visible; }
     }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <div class="card">
-    <div class="logo-container">
-      <img src="https://in.virbac.com/modules/virbac-static-resources-module/img/template/logo-virbac.svg" alt="Virbac Logo" class="brand-logo">
-    </div>
-
-    <h2>🐔 Nutrient Requirement</h2>
-    <p style="font-size:13px; color:#64748b; margin-bottom:12px;">Standard baseline synced with NRC guidelines.</p>
-    
-    <div class="stage-badge-container">
-      <div id="badge1" class="badge">0 to 3 Weeks (Starter)</div>
-      <div id="badge2" class="badge">3 to 6 Weeks (Grower)</div>
-      <div id="badge3" class="badge">6 to 8 Weeks (Finisher)</div>
-    </div>
-    
-    <label for="age">Select Age / Week Stage:</label>
-    <select id="age" onchange="updateStageBadge()">
-      <option value="7" selected>Day 7 (Week I: 0 to 3 Weeks)</option>
-      <option value="14">Day 14 (Week II: 0 to 3 Weeks)</option>
-      <option value="21">Day 21 (Week III: 0 to 3 Weeks)</option>
-      <option value="28">Day 28 (Week IV: 3 to 6 Weeks)</option>
-      <option value="35">Day 35 (Week V: 3 to 6 Weeks)</option>
-      <option value="42">Day 42 (Week VI: 3 to 6 Weeks)</option>
-      <option value="49">Day 49 (Week VII: 6 to 8 Weeks)</option>
-      <option value="56">Day 56 (Week VIII: 6 to 8 Weeks)</option>
-    </select>
-
-    <label for="actualBW">Observed Average Weight (grams / bird):</label>
-    <input type="number" id="actualBW" value="180" step="1">
-
-    <label for="flockSize">Total Flock Size (Number of Birds):</label>
-    <input type="number" id="flockSize" value="10000" step="500">
-
-    <button onclick="calculate()">Calculate Requirements</button>
+  <!-- TOP HEADER -->
+  <div class="top-bar">
+    <img src="https://in.virbac.com/assets/virbac/build/images/virbac-logo.03fd5e40.svg" alt="Virbac Logo" class="brand-logo">
+    <div class="divider"></div>
+    <h1 class="app-title">Poultry Connect</h1>
   </div>
 
-  <div class="card" id="results" style="display:none;">
-    <h3>📊 Diagnostic Summary (<span id="phaseDisplay"></span>)</h3>
+  <div class="container">
     
-    <div class="metrics-grid">
-      <div class="metric-box">
-        <label>Target Body Weight</label>
-        <div class="val" id="stdBWDisplay">-</div>
+    <!-- AUTHENTICATION SCREEN -->
+    <div id="authScreen" class="card no-print">
+      <div class="auth-header">
+        <h2 id="authTitle">Welcome BO</h2>
+        <p id="authSubtitle">Access the Diagnostics & Planner</p>
       </div>
-      <div class="metric-box">
-        <label>Observed Weight</label>
-        <div class="val" id="actBWDisplay">-</div>
-      </div>
-      <div class="metric-box danger">
-        <label>Weight Deficit</label>
-        <div class="val" id="bwDefDisplay">-</div>
-      </div>
-      <div class="metric-box">
-        <label>Extra Feed Needed</label>
-        <div class="val" id="feedNeedDisplay">-</div>
+      
+      <div class="card-body">
+        <div id="loginForm">
+          <div class="form-group">
+            <label>Email Address *</label>
+            <input type="email" id="loginEmail" placeholder="e.g., ramesh@virbac.com">
+          </div>
+          <button onclick="login()">Login</button>
+          <button class="btn-outline" onclick="toggleAuthMode()">New BO? Register Profile</button>
+        </div>
+
+        <div id="registerForm">
+          <div class="grid-2">
+            <div class="form-group"><label>Full Name *</label><input type="text" id="regName" placeholder="Ramesh Kumar"></div>
+            <div class="form-group"><label>Email Address *</label><input type="email" id="regEmail" placeholder="ramesh@virbac.com"></div>
+            <div class="form-group"><label>Employee Code</label><input type="text" id="regEmpCode" placeholder="e.g., VB-1042"></div>
+            <div class="form-group"><label>BU Unit</label><input type="text" id="regBuUnit" placeholder="e.g., Poultry North"></div>
+            <div class="form-group"><label>Region</label><input type="text" id="regRegion" placeholder="e.g., Punjab"></div>
+            <div class="form-group"><label>HQ Name</label><input type="text" id="regHq" placeholder="e.g., Ludhiana"></div>
+          </div>
+          <div style="margin-top: 10px;">
+            <button onclick="register()">Save Profile & Login</button>
+            <button class="btn-outline" onclick="toggleAuthMode()">Back to Login</button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div id="alertBox" class="alert"></div>
+    <!-- MAIN APP SCREEN -->
+    <div id="appScreen">
+      
+      <!-- BO Profile Widget -->
+      <div class="profile-banner">
+        <div>
+          <h3 style="color:white; margin:0 0 8px 0;" id="dispBoName">Loading...</h3>
+          <p id="dispBoDetails">Loading...</p>
+        </div>
+        <button style="width:auto; margin:0; padding:10px 20px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3);" class="no-print" onclick="logout()">Logout</button>
+      </div>
 
-    <h1 class="main-title">Restore the Core</h1>
-    <div class="sub-title">🧪 Recovery Breakdown</div>
+      <!-- Section 1: Customer & Farm Record -->
+      <div class="card">
+        <div class="card-body">
+          <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px;">01. Customer & Farm Record</h3>
+          
+          <label>Select Farm Type *</label>
+          <div class="farm-type-selector no-print">
+            <label class="radio-btn active" id="btnBroiler" onclick="setFarmType('broiler')">
+              <input type="radio" name="farmType" value="broiler" checked> 🐔 Broiler Farm
+            </label>
+            <label class="radio-btn" id="btnLayer" onclick="setFarmType('layer')">
+              <input type="radio" name="farmType" value="layer"> 🥚 Layer Farm
+            </label>
+          </div>
+          <!-- Print visible farm type -->
+          <div class="form-group" style="display:none;" id="printFarmTypeLabel">
+             <label>Farm Type</label>
+             <input type="text" id="printFarmType" readonly>
+          </div>
 
-    <div class="table-container">
-      <table id="nutrientTable">
-        <thead>
-          <tr>
-            <th>Category / Nutrient</th>
-            <th>Diet Requirement</th>
-            <th>Deficit / Bird</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+          <div class="grid-2">
+            <div class="form-group"><label>Farmer Name *</label><input type="text" id="farmerName" placeholder="e.g. Ramesh Babu"></div>
+            <div class="form-group"><label>Poultry Farm Name *</label><input type="text" id="farmName" placeholder="e.g. Sri Sai Poultry"></div>
+            <div class="form-group"><label>Mobile / WhatsApp *</label><input type="tel" id="mobile" placeholder="+91 "></div>
+            <div class="form-group"><label>Visit Date & Time *</label><input type="datetime-local" id="visitDate"></div>
+          </div>
+
+          <!-- Automated Email Reminder API Setup -->
+          <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-top: 15px;">
+            <label style="color: var(--primary);">📧 Setup Automated Follow-Up Email Reminder</label>
+            <div class="grid-2" style="align-items: end;">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>Remind me after (Days) *</label>
+                    <input type="number" id="followUpDays" value="7" min="1">
+                </div>
+                <button class="btn-outline no-print" style="margin:0; background: white;" onclick="triggerReminderAPI()">Schedule Reminder</button>
+            </div>
+            <small class="no-print" style="color:#64748b; margin-top:8px; display:block;">
+                * This sends an API webhook to trigger an automated email to your registered BO email address (via your backend integration like Zapier/Make) on the specified date.
+            </small>
+            <small style="color:#16a34a; font-weight:bold; display:none; margin-top:10px;" id="reminderSuccessMsg">✓ Reminder successfully scheduled!</small>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Section 2: Diagnostics -->
+      <div class="card">
+        <div class="card-body">
+          <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px;">02. Flock Diagnostics</h3>
+          
+          <!-- Broiler Parameters -->
+          <div id="broilerParams" class="grid-2">
+            <div class="form-group">
+              <label>Broiler Breed</label>
+              <select id="broilerBreed">
+                <option value="ross308">Ross 308 (Official Standard)</option>
+                <option value="cobb500">Cobb 500 (Official Standard)</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Flock Age (in Days)</label><input type="number" id="broilerAge" value="21"></div>
+            <div class="form-group"><label>Total Flock Size</label><input type="number" id="broilerSize" value="10000"></div>
+            <div class="form-group"><label>Observed Avg. Weight (grams)</label><input type="number" id="broilerBW" value="850"></div>
+          </div>
+
+          <!-- Layer Parameters -->
+          <div id="layerParams" class="grid-2">
+            <div class="form-group">
+              <label>Layer Breed</label>
+              <select id="layerBreed">
+                <option value="bv380">BV 380 / Commercial Brown</option>
+                <option value="babcock">Babcock / Commercial White</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Flock Age (in Weeks)</label><input type="number" id="layerAge" value="25"></div>
+            <div class="form-group"><label>Total Flock Size</label><input type="number" id="layerSize" value="10000"></div>
+            <div class="form-group"><label>Observed Avg. Weight (grams)</label><input type="number" id="layerBW" value="1500"></div>
+            <div class="form-group"><label>Current Egg Production (%)</label><input type="number" id="layerProd" value="90" max="100"></div>
+          </div>
+
+          <button class="no-print" style="margin-top: 20px;" onclick="calculateDiagnostics()">Run Diagnostics</button>
+        </div>
+      </div>
+
+      <!-- Section 3: Results & Recommendations -->
+      <div id="resultsSection">
+        <div class="card">
+          <div class="card-body">
+            <h3>Diagnostic Summary</h3>
+            <div class="grid-3">
+              <div style="background:#f8fafc; padding:15px; border-radius:8px; border: 1px solid var(--border); text-align:center;">
+                <span style="font-size:12px; color:#64748b; text-transform: uppercase; font-weight:600;">Target <span id="lblTargetWeight">Weight</span></span>
+                <div style="font-size:24px; font-weight:800; color:var(--primary); margin-top:4px;" id="resTarget"></div>
+              </div>
+              <div style="background:#f8fafc; padding:15px; border-radius:8px; border: 1px solid var(--border); text-align:center;">
+                <span style="font-size:12px; color:#64748b; text-transform: uppercase; font-weight:600;">Observed <span id="lblObsWeight">Weight</span></span>
+                <div style="font-size:24px; font-weight:800; color:var(--primary); margin-top:4px;" id="resObserved"></div>
+              </div>
+              <div style="background:#f8fafc; padding:15px; border-radius:8px; border: 1px solid var(--border); text-align:center;">
+                <span style="font-size:12px; color:#64748b; text-transform: uppercase; font-weight:600;">Variance</span>
+                <div style="font-size:24px; font-weight:800; margin-top:4px;" id="resVariance"></div>
+              </div>
+            </div>
+            
+            <!-- Layer Specific Production Metric -->
+            <div id="layerProdBox" class="grid-2" style="display:none; margin-top:15px;">
+                <div style="background:#f8fafc; padding:15px; border-radius:8px; border: 1px solid var(--border); text-align:center;">
+                    <span style="font-size:12px; color:#64748b; text-transform: uppercase; font-weight:600;">Target Egg Prod.</span>
+                    <div style="font-size:24px; font-weight:800; color:var(--primary); margin-top:4px;" id="resTargetProd"></div>
+                </div>
+                <div style="background:#f8fafc; padding:15px; border-radius:8px; border: 1px solid var(--border); text-align:center;">
+                    <span style="font-size:12px; color:#64748b; text-transform: uppercase; font-weight:600;">Prod. Variance</span>
+                    <div style="font-size:24px; font-weight:800; margin-top:4px;" id="resProdVariance"></div>
+                </div>
+            </div>
+
+            <div id="alertBox"></div>
+          </div>
+        </div>
+
+        <div class="card no-print">
+          <div class="card-body">
+            <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">03. Product Planner & Costing</h3>
+            <p style="font-size:14px; color:#475569; margin-bottom: 20px;">Select required products for intervention/maintenance to calculate costs.</p>
+            
+            <div class="table-responsive">
+              <table id="plannerTable">
+                <thead>
+                  <tr>
+                    <th style="width: 50px; text-align:center;">Select</th>
+                    <th>Product & Pack</th>
+                    <th>Standard Dose Rate</th>
+                    <th>MRP (₹)</th>
+                  </tr>
+                </thead>
+                <tbody id="productTbody"></tbody>
+              </table>
+            </div>
+            
+            <div class="form-group" style="margin-top:20px; max-width: 300px;">
+              <label>Treatment Course Duration (Days)</label>
+              <input type="number" id="courseDays" value="3">
+            </div>
+            <button class="btn-secondary" onclick="calculateCosting()">Generate Cost Report</button>
+          </div>
+        </div>
+
+        <div class="card" id="costReport">
+          <div class="card-body">
+            <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">Cost & Treatment Plan</h3>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Pack Size</th>
+                    <th>Total Vol Required</th>
+                    <th>Packs Needed</th>
+                    <th>Farmer Cost (MRP)</th>
+                    <th>Cost / Bird / Day</th>
+                  </tr>
+                </thead>
+                <tbody id="costTbody"></tbody>
+              </table>
+            </div>
+            
+            <div class="no-print" style="margin-top:30px; text-align:center; padding-top: 20px; border-top: 1px solid var(--border);">
+              <p style="color:#64748b; font-size:14px; margin-bottom:15px;">Review the details above. Click below to save a professional copy for your records or share with the farmer.</p>
+              <button style="max-width:350px; width:100%; font-size: 16px; padding: 14px;" onclick="window.print()">🖨️ Save Report as PDF</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
-</div>
 
 <script>
-  const stdData = {
-    '1': {bw: 92, fcr: 0.24, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
-    '2': {bw: 115, fcr: 0.40, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
-    '3': {bw: 135, fcr: 0.53, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
-    '4': {bw: 158, fcr: 0.64, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
-    '5': {bw: 178, fcr: 0.75, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
-    '6': {bw: 201, fcr: 0.85, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
-    '7': {bw: 221, fcr: 0.95, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
-    '8': {bw: 264, fcr: 0.97, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
-    '9': {bw: 301, fcr: 1.00, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
-    '10': {bw: 338, fcr: 1.03, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
-    '11': {bw: 377, fcr: 1.07, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
-    '12': {bw: 413, fcr: 1.11, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
-    '13': {bw: 450, fcr: 1.16, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
-    '14': {bw: 487, fcr: 1.20, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
-    '15': {bw: 564, fcr: 1.20, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
-    '16': {bw: 621, fcr: 1.21, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
-    '17': {bw: 678, fcr: 1.23, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
-    '18': {bw: 737, fcr: 1.24, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
-    '19': {bw: 793, fcr: 1.26, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
-    '20': {bw: 850, fcr: 1.29, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
-    '21': {bw: 907, fcr: 1.31, phaseKey: 'w0_3', phaseLabel: '0 to 3 Weeks Stage'},
-    '22': {bw: 1008, fcr: 1.31, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
-    '23': {bw: 1085, fcr: 1.32, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
-    '24': {bw: 1165, fcr: 1.33, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
-    '25': {bw: 1242, fcr: 1.35, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
-    '26': {bw: 1322, fcr: 1.37, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
-    '27': {bw: 1399, fcr: 1.39, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
-    '28': {bw: 1479, fcr: 1.41, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
-    '29': {bw: 1566, fcr: 1.43, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
-    '30': {bw: 1649, fcr: 1.45, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
-    '31': {bw: 1732, fcr: 1.47, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
-    '32': {bw: 1813, fcr: 1.48, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
-    '33': {bw: 1897, fcr: 1.50, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
-    '34': {bw: 1980, fcr: 1.52, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
-    '35': {bw: 2063, fcr: 1.54, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
-    '36': {bw: 2162, fcr: 1.56, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
-    '37': {bw: 2255, fcr: 1.57, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
-    '38': {bw: 2345, fcr: 1.59, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
-    '39': {bw: 2438, fcr: 1.61, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
-    '40': {bw: 2528, fcr: 1.63, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
-    '41': {bw: 2621, fcr: 1.66, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
-    '42': {bw: 2711, fcr: 1.68, phaseKey: 'w3_6', phaseLabel: '3 to 6 Weeks Stage'},
-    '43': {bw: 2832, fcr: 1.70, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
-    '44': {bw: 2936, fcr: 1.71, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
-    '45': {bw: 3043, fcr: 1.73, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
-    '46': {bw: 3149, fcr: 1.74, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
-    '47': {bw: 3255, fcr: 1.75, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
-    '48': {bw: 3359, fcr: 1.77, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
-    '49': {bw: 3466, fcr: 1.78, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
-    '50': {bw: 3602, fcr: 1.78, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
-    '51': {bw: 3725, fcr: 1.79, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
-    '52': {bw: 3845, fcr: 1.79, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
-    '53': {bw: 3968, fcr: 1.80, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
-    '54': {bw: 4088, fcr: 1.80, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
-    '55': {bw: 4211, fcr: 1.81, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'},
-    '56': {bw: 4331, fcr: 1.81, phaseKey: 'w6_8', phaseLabel: '6 to 8 Weeks Stage'}
-  };
-
-  const nutrients = [
-    {name: "Crude protein", unit: "%", w0_3: 23.0, w3_6: 20.0, w6_8: 18.0},
-    {name: "Arginine", unit: "%", w0_3: 1.25, w3_6: 1.10, w6_8: 1.00},
-    {name: "Glycine + serine", unit: "%", w0_3: 1.25, w3_6: 1.14, w6_8: 0.97},
-    {name: "Histidine", unit: "%", w0_3: 0.35, w3_6: 0.32, w6_8: 0.27},
-    {name: "Isoleucine", unit: "%", w0_3: 0.80, w3_6: 0.73, w6_8: 0.62},
-    {name: "Leucine", unit: "%", w0_3: 1.20, w3_6: 1.09, w6_8: 0.93},
-    {name: "Lysine", unit: "%", w0_3: 1.10, w3_6: 1.00, w6_8: 0.85},
-    {name: "Methionine", unit: "%", w0_3: 0.50, w3_6: 0.38, w6_8: 0.32},
-    {name: "Methionine + cystine", unit: "%", w0_3: 0.90, w3_6: 0.72, w6_8: 0.60},
-    {name: "Phenylalanine", unit: "%", w0_3: 0.72, w3_6: 0.65, w6_8: 0.56},
-    {name: "Phenylalanine + tyrosine", unit: "%", w0_3: 1.34, w3_6: 1.22, w6_8: 1.04},
-    {name: "Proline", unit: "%", w0_3: 0.60, w3_6: 0.55, w6_8: 0.46},
-    {name: "Threonine", unit: "%", w0_3: 0.80, w3_6: 0.74, w6_8: 0.68},
-    {name: "Tryptophan", unit: "%", w0_3: 0.20, w3_6: 0.18, w6_8: 0.16},
-    {name: "Valine", unit: "%", w0_3: 0.90, w3_6: 0.82, w6_8: 0.70},
-    {name: "Linoleic acid", unit: "%", w0_3: 1.00, w3_6: 1.00, w6_8: 1.00},
-    {name: "Calcium", unit: "%", w0_3: 1.00, w3_6: 0.90, w6_8: 0.80},
-    {name: "Chlorine", unit: "%", w0_3: 0.20, w3_6: 0.15, w6_8: 0.12},
-    {name: "Magnesium", unit: "mg", w0_3: 600.0, w3_6: 600.0, w6_8: 600.0},
-    {name: "Nonphytate phosphorus", unit: "%", w0_3: 0.45, w3_6: 0.35, w6_8: 0.30},
-    {name: "Potassium", unit: "%", w0_3: 0.30, w3_6: 0.30, w6_8: 0.30},
-    {name: "Sodium", unit: "%", w0_3: 0.20, w3_6: 0.15, w6_8: 0.12},
-    {name: "Copper", unit: "mg", w0_3: 8.0, w3_6: 8.0, w6_8: 8.0},
-    {name: "Iodine", unit: "mg", w0_3: 0.35, w3_6: 0.35, w6_8: 0.35},
-    {name: "Iron", unit: "mg", w0_3: 80.0, w3_6: 80.0, w6_8: 80.0},
-    {name: "Manganese", unit: "mg", w0_3: 60.0, w3_6: 60.0, w6_8: 60.0},
-    {name: "Selenium", unit: "mg", w0_3: 0.15, w3_6: 0.15, w6_8: 0.15},
-    {name: "Zinc", unit: "mg", w0_3: 40.0, w3_6: 40.0, w6_8: 40.0},
-    {name: "Vitamin A", unit: "IU", w0_3: 1500.0, w3_6: 1500.0, w6_8: 1500.0},
-    {name: "Vitamin D₃", unit: "ICU", w0_3: 200.0, w3_6: 200.0, w6_8: 200.0},
-    {name: "Vitamin E", unit: "IU", w0_3: 10.0, w3_6: 10.0, w6_8: 10.0},
-    {name: "Vitamin K", unit: "mg", w0_3: 0.5, w3_6: 0.5, w6_8: 0.5},
-    {name: "Vitamin B₁₂", unit: "mg", w0_3: 0.01, w3_6: 0.01, w6_8: 0.007},
-    {name: "Biotin", unit: "mg", w0_3: 0.15, w3_6: 0.15, w6_8: 0.12},
-    {name: "Choline", unit: "mg", w0_3: 1300.0, w3_6: 1000.0, w6_8: 750.0},
-    {name: "Folacin", unit: "mg", w0_3: 0.55, w3_6: 0.55, w6_8: 0.50},
-    {name: "Niacin", unit: "mg", w0_3: 35.0, w3_6: 30.0, w6_8: 25.0},
-    {name: "Pantothenic acid", unit: "mg", w0_3: 10.0, w3_6: 10.0, w6_8: 10.0},
-    {name: "Pyridoxine", unit: "mg", w0_3: 3.5, w3_6: 3.5, w6_8: 3.0},
-    {name: "Riboflavin", unit: "mg", w0_3: 3.6, w3_6: 3.6, w6_8: 3.0},
-    {name: "Thiamin", unit: "mg", w0_3: 1.8, w3_6: 1.8, w6_8: 1.8}
+  // --- VIRBAC PRODUCT DATABASE ---
+  const products = [
+    { name: "Calgophos 1 Lit", group: "Mineral", dosePer100: 30, unit: "ml", mrp: 715, packVol: 1000 },
+    { name: "Calgophos 5 Lit", group: "Mineral", dosePer100: 30, unit: "ml", mrp: 3250, packVol: 5000 },
+    { name: "Calgophos 10 Lit", group: "Mineral", dosePer100: 30, unit: "ml", mrp: 6000, packVol: 10000 },
+    { name: "Vitagro 1 Lit", group: "Vitamin", dosePer100: 15, unit: "ml", mrp: 1325, packVol: 1000 },
+    { name: "Brotone Vet 120 ml", group: "Liver", dosePer100: 20, unit: "ml", mrp: 90, packVol: 120 },
+    { name: "Brotone Vet 500 ml", group: "Liver", dosePer100: 20, unit: "ml", mrp: 320, packVol: 500 },
+    { name: "Brotone Vet 5 Ltr", group: "Liver", dosePer100: 20, unit: "ml", mrp: 2400, packVol: 5000 },
+    { name: "Carniforcyl 1 Ltr", group: "Detox", dosePer100: 15, unit: "ml", mrp: 1200, packVol: 1000 },
+    { name: "Carniforcyl 5 Ltr", group: "Detox", dosePer100: 15, unit: "ml", mrp: 5500, packVol: 5000 },
+    { name: "Anabolite-P 2 Lit", group: "Energy", dosePer100: 15, unit: "ml", mrp: 1725, packVol: 2000 },
+    { name: "Anabolite-P 5 Lit", group: "Energy", dosePer100: 15, unit: "ml", mrp: 4100, packVol: 5000 },
+    { name: "Vimeral 120 ml", group: "Anti-stress", dosePer100: 15, unit: "ml", mrp: 200, packVol: 120 },
+    { name: "Vimeral 500 ml", group: "Anti-stress", dosePer100: 15, unit: "ml", mrp: 730, packVol: 500 },
+    { name: "Vimeral Forte 5 Ltr", group: "Anti-stress", dosePer100: 15, unit: "ml", mrp: 7885, packVol: 5000 },
+    { name: "Groviplex S 1 Ltr", group: "B-Complex", dosePer100: 20, unit: "ml", mrp: 260, packVol: 1000 },
+    { name: "Groviplex S 2 Ltr", group: "B-Complex", dosePer100: 20, unit: "ml", mrp: 495, packVol: 2000 },
+    { name: "Vitablend WMF 1 Lit", group: "Vitamin A", dosePer100: 5, unit: "ml", mrp: 3000, packVol: 1000 },
+    { name: "Lixen Powder 300 gm", group: "Antibiotic", dosePer100: 10, unit: "gm", mrp: 1245, packVol: 300 },
+    { name: "Trox 120 gm", group: "CRD", dosePer100: 15, unit: "gm", mrp: 1415, packVol: 120 },
+    { name: "Albomar 500 ml", group: "Dewormer", dosePer100: 30, unit: "ml", mrp: 365, packVol: 500 },
+    { name: "Hitek Orl. Solution 1 Ltr", group: "Endectocide", dosePer100: 25, unit: "ml", mrp: 975, packVol: 1000 },
+    { name: "Clinar 1 Lit", group: "Ectoparasiticide", dosePer100: 10, unit: "ml", mrp: 1190, packVol: 1000 },
+    { name: "Addon Poultry Max 1kg", group: "Gut Health", dosePer100: 100, unit: "gm", mrp: 2140, packVol: 1000 },
+    { name: "Toximar Forte 5 kg", group: "Toxin Binder", dosePer100: 1000, unit: "gm", mrp: 605, packVol: 5000 },
+    { name: "Toximar Forte 20 kg", group: "Toxin Binder", dosePer100: 1000, unit: "gm", mrp: 2550, packVol: 20000 },
+    { name: "Kalzol Forte 10 kg", group: "Calcium", dosePer100: 1500, unit: "gm", mrp: 3000, packVol: 10000 },
+    { name: "Layblend 5 Kg", group: "Premix", dosePer100: 500, unit: "gm", mrp: 2000, packVol: 5000 },
+    { name: "Kohrsolin TH 500 ml", group: "Disinfectant", dosePer100: 30, unit: "ml", mrp: 905, packVol: 500 },
+    { name: "Kohrsolin TH 5 lit", group: "Disinfectant", dosePer100: 30, unit: "ml", mrp: 8350, packVol: 5000 },
+    { name: "Germer 500 ml", group: "Surface Protector", dosePer100: 30, unit: "ml", mrp: 875, packVol: 500 },
+    { name: "Germer 5 Lit", group: "Surface Protector", dosePer100: 30, unit: "ml", mrp: 7575, packVol: 5000 },
+    { name: "Dalguban N PLUS LIVE 2000 D", group: "Vaccine", dosePer100: 1, unit: "vial", mrp: 975, packVol: 1 },
+    { name: "Sokrena W.S 500 ml", group: "Water Sanitizer", dosePer100: 1, unit: "ml", mrp: 600, packVol: 500 },
+    { name: "Sokrena W.S 5 lit", group: "Water Sanitizer", dosePer100: 1, unit: "ml", mrp: 5150, packVol: 5000 },
+    { name: "Olklin W Poultry 500 ML", group: "Water Cleanser", dosePer100: 2, unit: "ml", mrp: 384, packVol: 500 },
+    { name: "Olklin W Poultry 5 LIT", group: "Water Cleanser", dosePer100: 2, unit: "ml", mrp: 3400, packVol: 5000 },
+    { name: "Olklin SW Poultry 500gm", group: "Surface Disinfectant", dosePer100: 5, unit: "gm", mrp: 1500, packVol: 500 }
   ];
 
-  function updateStageBadge() {
-    const age = document.getElementById('age').value;
-    const benchmark = stdData[age];
-    
-    document.getElementById('badge1').classList.remove('active');
-    document.getElementById('badge2').classList.remove('active');
-    document.getElementById('badge3').classList.remove('active');
+  // --- STANDARD RUNNING METRICS (Interpolated for exact days/weeks) ---
+  const standards = {
+    broiler: {
+      ross308: { 0:42, 7:205, 14:494, 21:959, 28:1597, 35:2382, 42:3252, 49:4141, 56:5000 },
+      cobb500: { 0:42, 7:204, 14:496, 21:963, 28:1603, 35:2395, 42:3286, 49:4216, 56:5100 }
+    },
+    layer: { // Typical Commercial Brown (e.g. BV380) weekly targets
+      weight: { 1:75, 5:390, 10:840, 15:1250, 20:1600, 25:1750, 30:1850, 40:1900, 50:1920, 80:1950 },
+      prod: { 18:5, 19:30, 20:55, 21:80, 22:90, 25:96, 30:96, 40:94, 50:90, 60:85, 70:80, 80:75 }
+    }
+  };
 
-    if (benchmark.phaseKey === 'w0_3') {
-      document.getElementById('badge1').classList.add('active');
-    } else if (benchmark.phaseKey === 'w3_6') {
-      document.getElementById('badge2').classList.add('active');
+  function getInterpolatedTarget(dataset, inputPoint) {
+    const keys = Object.keys(dataset).map(Number).sort((a,b)=>a-b);
+    if(inputPoint <= keys[0]) return dataset[keys[0]];
+    if(inputPoint >= keys[keys.length-1]) return dataset[keys[keys.length-1]];
+    
+    for(let i=0; i<keys.length-1; i++) {
+        if(inputPoint >= keys[i] && inputPoint <= keys[i+1]) {
+            const x0 = keys[i], y0 = dataset[x0];
+            const x1 = keys[i+1], y1 = dataset[x1];
+            // Linear interpolation
+            return y0 + (y1 - y0) * ((inputPoint - x0) / (x1 - x0));
+        }
+    }
+    return 0;
+  }
+
+  // --- STATE ---
+  let currentUser = null;
+  let currentFarmType = 'broiler';
+  let currentDiagnosticState = {};
+
+  window.onload = function() {
+    const savedUser = localStorage.getItem('virbac_bo_profile');
+    if (savedUser) {
+      currentUser = JSON.parse(savedUser);
+      showApp();
     } else {
-      document.getElementById('badge3').classList.add('active');
+      showAuth();
+    }
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    document.getElementById('visitDate').value = now.toISOString().slice(0,16);
+    populateProductTable();
+  };
+
+  // --- AUTH LOGIC ---
+  function showAuth() {
+    document.getElementById('appScreen').style.display = 'none';
+    document.getElementById('authScreen').style.display = 'block';
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('registerForm').style.display = 'none';
+  }
+
+  function showApp() {
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('appScreen').style.display = 'block';
+    document.getElementById('dispBoName').innerText = currentUser.name;
+    document.getElementById('dispBoDetails').innerText = `Emp Code: ${currentUser.empCode} | BU: ${currentUser.buUnit} | HQ: ${currentUser.hq} | Email: ${currentUser.email}`;
+  }
+
+  function toggleAuthMode() {
+    const login = document.getElementById('loginForm');
+    const reg = document.getElementById('registerForm');
+    const title = document.getElementById('authTitle');
+    const sub = document.getElementById('authSubtitle');
+    
+    if (login.style.display === 'none') {
+      login.style.display = 'block';
+      reg.style.display = 'none';
+      title.innerText = "Welcome BO";
+      sub.innerText = "Access the Diagnostics & Planner";
+    } else {
+      login.style.display = 'none';
+      reg.style.display = 'block';
+      title.innerText = "Register Profile";
+      sub.innerText = "Setup your local BO profile";
     }
   }
 
-  function calculate() {
-    const age = document.getElementById('age').value;
-    const actualBW = parseFloat(document.getElementById('actualBW').value);
-    const flockSize = parseInt(document.getElementById('flockSize').value);
+  function register() {
+    const profile = {
+      name: document.getElementById('regName').value,
+      email: document.getElementById('regEmail').value,
+      empCode: document.getElementById('regEmpCode').value,
+      buUnit: document.getElementById('regBuUnit').value,
+      region: document.getElementById('regRegion').value,
+      hq: document.getElementById('regHq').value,
+    };
+    if(!profile.email || !profile.name) return alert("Name and Email are required.");
+    
+    localStorage.setItem('virbac_bo_profile', JSON.stringify(profile));
+    currentUser = profile;
+    showApp();
+  }
 
-    const benchmark = stdData[age];
-    const stdBW = benchmark.bw;
-    const fcr = benchmark.fcr;
-    const phaseKey = benchmark.phaseKey;
-    const phaseLabel = benchmark.phaseLabel;
-
-    const bwDeficit = Math.max(0, stdBW - actualBW);
-    const catchupFeedGrams = bwDeficit * fcr;
-    const flockExtraFeedKg = (catchupFeedGrams * flockSize) / 1000;
-
-    document.getElementById('results').style.display = 'block';
-    document.getElementById('phaseDisplay').innerText = phaseLabel;
-    document.getElementById('stdBWDisplay').innerText = stdBW + ' g';
-    document.getElementById('actBWDisplay').innerText = actualBW + ' g';
-    document.getElementById('bwDefDisplay').innerText = bwDeficit.toFixed(1) + ' g';
-    document.getElementById('feedNeedDisplay').innerText = catchupFeedGrams.toFixed(1) + ' g/bird';
-
-    const alertBox = document.getElementById('alertBox');
-    if (bwDeficit > 0) {
-      alertBox.style.display = 'block';
-      alertBox.innerHTML = `⚠️ Flock is <b>${bwDeficit.toFixed(1)} g underweight</b> in the <b>${phaseLabel}</b>. Additional balanced feed required across ${flockSize.toLocaleString()} birds: <b>${flockExtraFeedKg.toFixed(2)} kg</b>.`;
+  function login() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const savedUser = JSON.parse(localStorage.getItem('virbac_bo_profile') || '{}');
+    if (email === savedUser.email) {
+      currentUser = savedUser;
+      showApp();
     } else {
-      alertBox.style.display = 'none';
+      alert("Profile not found on this device. Please register.");
+      toggleAuthMode();
+    }
+  }
+
+  function logout() {
+    if(confirm("Are you sure you want to remove your profile from this device?")) {
+        localStorage.removeItem('virbac_bo_profile');
+        location.reload();
+    }
+  }
+
+  // --- UI TOGGLES ---
+  function setFarmType(type) {
+    currentFarmType = type;
+    document.getElementById('printFarmType').value = type === 'broiler' ? 'Broiler Farm' : 'Layer Farm';
+    
+    if(type === 'broiler') {
+        document.getElementById('btnBroiler').classList.add('active');
+        document.getElementById('btnLayer').classList.remove('active');
+        document.getElementById('broilerParams').style.display = 'grid';
+        document.getElementById('layerParams').style.display = 'none';
+        document.getElementById('layerProdBox').style.display = 'none';
+    } else {
+        document.getElementById('btnLayer').classList.add('active');
+        document.getElementById('btnBroiler').classList.remove('active');
+        document.getElementById('layerParams').style.display = 'grid';
+        document.getElementById('broilerParams').style.display = 'none';
+    }
+    // reset results
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  // --- DIAGNOSTICS LOGIC ---
+  function calculateDiagnostics() {
+    const alertBox = document.getElementById('alertBox');
+    const varEl = document.getElementById('resVariance');
+    
+    if (currentFarmType === 'broiler') {
+        const breed = document.getElementById('broilerBreed').value;
+        const age = parseInt(document.getElementById('broilerAge').value);
+        const size = parseInt(document.getElementById('broilerSize').value);
+        const actBW = parseFloat(document.getElementById('broilerBW').value);
+        
+        if(!age || !size || !actBW) return alert("Please fill in all Broiler diagnostic fields.");
+
+        const targetBW = getInterpolatedTarget(standards.broiler[breed], age);
+        const variance = actBW - targetBW;
+        const varPercent = (variance / targetBW) * 100;
+
+        document.getElementById('resTarget').innerText = targetBW.toFixed(0) + ' g';
+        document.getElementById('resObserved').innerText = actBW + ' g';
+        varEl.innerText = (variance > 0 ? '+' : '') + variance.toFixed(0) + ' g';
+
+        if (variance >= -10) { // small buffer for 'good'
+            varEl.style.color = 'var(--success)';
+            alertBox.className = 'alert success';
+            alertBox.innerHTML = `<strong>🌟 Excellent Management!</strong> The broiler flock is matching or exceeding standard ${breed.toUpperCase()} running benchmarks. Continue standard maintenance protocols. Ensure gut health with Addon Poultry Max to sustain performance.`;
+        } else {
+            varEl.style.color = 'var(--warning)';
+            alertBox.className = 'alert danger';
+            alertBox.innerHTML = `<strong>⚠️ Underweight Alert:</strong> Flock is falling behind standard benchmarks by ${Math.abs(varPercent).toFixed(1)}%. <br>
+            <strong>Probable Reasons for Deviation (Pointers to Investigate):</strong>
+            <ul class="pointers-list">
+                <li><strong>Management:</strong> Sub-optimal brooding temperature, poor ventilation, or high stocking density.</li>
+                <li><strong>Feed & Water:</strong> Poor early feed intake, inadequate feeder/drinker space, or restricted water access.</li>
+                <li><strong>Toxins:</strong> Mycotoxin contamination in feed reducing nutrient absorption (Consider <em>Toximar Forte</em>).</li>
+                <li><strong>Health:</strong> Early yolk sac infection (Consider <em>Anabolite-P</em>), Sub-clinical Coccidiosis, Enteric diseases, or CRD stress (Consider <em>Trox</em>).</li>
+            </ul>
+            <em>Select supportive therapies below to formulate a rapid recovery plan.</em>`;
+        }
+        currentDiagnosticState = { size };
+        
+    } else {
+        // LAYER
+        const age = parseInt(document.getElementById('layerAge').value); // in WEEKS
+        const size = parseInt(document.getElementById('layerSize').value);
+        const actBW = parseFloat(document.getElementById('layerBW').value);
+        const actProd = parseFloat(document.getElementById('layerProd').value);
+        
+        if(!age || !size || !actBW || isNaN(actProd)) return alert("Please fill in all Layer diagnostic fields.");
+
+        const targetBW = getInterpolatedTarget(standards.layer.weight, age);
+        const varianceBW = actBW - targetBW;
+        const varBWPercent = (varianceBW / targetBW) * 100;
+
+        let targetProd = 0;
+        if(age >= 18) targetProd = getInterpolatedTarget(standards.layer.prod, age);
+        const varianceProd = actProd - targetProd;
+
+        document.getElementById('resTarget').innerText = targetBW.toFixed(0) + ' g';
+        document.getElementById('resObserved').innerText = actBW + ' g';
+        varEl.innerText = (varianceBW > 0 ? '+' : '') + varianceBW.toFixed(0) + ' g';
+        
+        if(age >= 18) {
+            document.getElementById('layerProdBox').style.display = 'grid';
+            document.getElementById('resTargetProd').innerText = targetProd.toFixed(1) + '%';
+            
+            const prodVarEl = document.getElementById('resProdVariance');
+            prodVarEl.innerText = (varianceProd > 0 ? '+' : '') + varianceProd.toFixed(1) + '%';
+            prodVarEl.style.color = varianceProd >= -2 ? 'var(--success)' : 'var(--warning)';
+        } else {
+            document.getElementById('layerProdBox').style.display = 'none';
+        }
+
+        // Determine Layer Alert
+        if (varianceBW >= -20 && varianceProd >= -3) {
+            varEl.style.color = 'var(--success)';
+            alertBox.className = 'alert success';
+            alertBox.innerHTML = `<strong>🌟 Excellent Management!</strong> The layer flock is on target for body weight and egg production. Maintain routine calcium/mineral supplementation (<em>Calgophos / Kalzol Forte</em>) and bio-security.`;
+        } else {
+            varEl.style.color = 'var(--warning)';
+            alertBox.className = 'alert danger';
+            alertBox.innerHTML = `<strong>⚠️ Sub-Optimal Performance Alert:</strong> 
+            Body weight variance is ${varianceBW.toFixed(0)}g and production is off by ${varianceProd.toFixed(1)}%. <br>
+            <strong>Probable Reasons for Deviation (Pointers to Investigate):</strong>
+            <ul class="pointers-list">
+                <li><strong>Nutrition:</strong> Calcium/Phosphorus imbalance or Vitamin D3 deficiency causing drops in production or thin shells (Consider <em>Calgophos</em>).</li>
+                <li><strong>Stress factors:</strong> Inadequate lighting schedule, sudden light interruption, or Heat stress reducing feed intake (Consider <em>Vimeral Forte</em>).</li>
+                <li><strong>Health:</strong> Viral challenges (ND, IB, EDS) affecting reproductive tract or Liver stress / Fatty Liver syndrome (Consider <em>Brotone</em>).</li>
+                <li><strong>Toxins & Parasites:</strong> Worm infestation (Consider <em>Albomar</em>) or Mycotoxin load impacting liver function.</li>
+            </ul>
+            <em>Select supportive therapies below to formulate a recovery plan.</em>`;
+        }
+        currentDiagnosticState = { size };
     }
 
-    const tbody = document.querySelector('#nutrientTable tbody');
+    document.getElementById('resultsSection').style.display = 'block';
+    // Hide print farm label until actually printing, we handle that via media queries but let's toggle inline style
+    document.getElementById('printFarmTypeLabel').style.display = 'block';
+  }
+
+  // --- API / NOTIFICATION PROVISION ---
+  function triggerReminderAPI() {
+    const followUpDays = document.getElementById('followUpDays').value;
+    const msg = document.getElementById('reminderSuccessMsg');
+    
+    // In a real environment, this makes a fetch() call to a backend webhook
+    // e.g., fetch('https://hook.eu1.make.com/xxxx', { method: 'POST', body: JSON.stringify({...}) })
+    // For this client-side demo, we simulate the success response.
+    
+    msg.style.display = 'block';
+    setTimeout(() => { msg.style.display = 'none'; }, 4000);
+  }
+
+  // --- COST CALCULATOR ---
+  function populateProductTable() {
+    const tbody = document.getElementById('productTbody');
     tbody.innerHTML = '';
-
-    nutrients.forEach(n => {
-      const req = n[phaseKey];
-      let defBird = 0;
-      let dispUnit = n.unit;
-
-      if (n.unit === '%') {
-        defBird = (req / 100.0) * catchupFeedGrams;
-      } else if (n.unit === 'mg') {
-        defBird = (req / 1000.0) * catchupFeedGrams;
-      } else { // IU / ICU
-        defBird = (req / 1000.0) * catchupFeedGrams;
-      }
-
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><b>${n.name}</b></td>
-        <td>${req} ${n.unit}${n.unit !== '%' ? '/kg' : ''}</td>
-        <td>${defBird.toFixed(3)} ${dispUnit}</td>
+    products.forEach((p, idx) => {
+      tbody.innerHTML += `
+        <tr>
+          <td style="text-align:center;"><input type="checkbox" class="prod-checkbox" value="${idx}" style="width:18px; height:18px; cursor:pointer;"></td>
+          <td><b>${p.name}</b><br><small style="color:#64748b;">${p.group}</small></td>
+          <td>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <input type="number" id="dose_${idx}" value="${p.dosePer100}" style="width:70px; padding:6px; font-size:14px; min-height:30px;">
+                <span style="font-size:13px; color:#475569;">${p.unit}/100birds</span>
+            </div>
+          </td>
+          <td style="font-weight:600; color:var(--text);">₹${p.mrp}</td>
+        </tr>
       `;
-      tbody.appendChild(tr);
     });
   }
 
-  // Initialize active stage badge on load
-  updateStageBadge();
-</script>
+  function calculateCosting() {
+    const size = currentDiagnosticState.size;
+    if(!size) return alert("Run diagnostics first.");
+    
+    const days = parseInt(document.getElementById('courseDays').value);
+    const tbody = document.getElementById('costTbody');
+    tbody.innerHTML = '';
+    
+    const checkboxes = document.querySelectorAll('.prod-checkbox:checked');
+    if (checkboxes.length === 0) return alert("Select at least one product to generate a cost report.");
 
+    let totalCost = 0;
+
+    checkboxes.forEach(cb => {
+      const idx = cb.value;
+      const p = products[idx];
+      const customDose = parseFloat(document.getElementById(`dose_${idx}`).value);
+      
+      let totalUnitsReq = 0;
+      if(p.unit === 'vial') {
+         totalUnitsReq = Math.ceil(size / 2000); 
+      } else {
+         totalUnitsReq = (customDose / 100) * size * days;
+      }
+      
+      let packsNeeded = 0;
+      if (p.unit === 'vial') packsNeeded = totalUnitsReq;
+      else packsNeeded = Math.ceil(totalUnitsReq / p.packVol);
+
+      const rowCost = packsNeeded * p.mrp;
+      totalCost += rowCost;
+
+      let displayUnit = "";
+      if(p.unit === 'vial') displayUnit = totalUnitsReq + " Vials";
+      else displayUnit = totalUnitsReq > 1000 ? (totalUnitsReq/1000).toFixed(2) + (p.unit==='ml'?' L':' kg') : totalUnitsReq.toFixed(0) + " " + p.unit;
+
+      let packDisplay = (p.packVol >= 1000 ? p.packVol/1000 + (p.unit==='ml'?'L':'kg') : p.packVol + p.unit);
+      if(p.unit === 'vial') packDisplay = "1 Vial";
+
+      tbody.innerHTML += `
+        <tr>
+          <td><b>${p.name}</b></td>
+          <td>${packDisplay}</td>
+          <td>${displayUnit}</td>
+          <td>${packsNeeded}</td>
+          <td style="font-weight:600;">₹${rowCost.toLocaleString()}</td>
+          <td>₹${(rowCost / size / days).toFixed(2)}</td>
+        </tr>
+      `;
+    });
+
+    document.getElementById('costReport').style.display = 'block';
+  }
+</script>
 </body>
 </html>
