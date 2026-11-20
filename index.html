@@ -238,6 +238,53 @@
     .add-product-container select { width: 220px; min-height: 40px; padding: 8px 12px; font-size: 14px; }
     .add-product-container button { width: auto; min-height: 40px; padding: 0 16px; margin: 0; font-size: 14px; }
     
+
+    .protocol-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .protocol-tab-btn {
+      width: auto;
+      min-height: 40px;
+      padding: 8px 16px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background-color: #f8fafc;
+      color: var(--text);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .protocol-tab-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background-color: rgba(21, 60, 138, 0.04);
+    }
+    .protocol-tab-btn.active {
+      background-color: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 2px 6px rgba(21, 60, 138, 0.2);
+    }
+    .protocol-tab-btn.restore-btn {
+      border-color: var(--secondary);
+      color: var(--secondary);
+      background-color: rgba(5, 150, 105, 0.06);
+    }
+    .protocol-tab-btn.restore-btn:hover,
+    .protocol-tab-btn.restore-btn.active {
+      background-color: var(--secondary);
+      color: #ffffff;
+      border-color: var(--secondary);
+      box-shadow: 0 2px 6px rgba(5, 150, 105, 0.25);
+    }
+
     #farmHistorySection {
         background-color: #f8fafc;
         padding: 15px;
@@ -493,7 +540,17 @@
                   </button>
                 </div>
             </div>
-            <p style="font-size:14px; color:#475569; margin-bottom: 20px;">Select required products and enter your offered Customer Pricing to calculate costs.</p>
+
+            <div class="protocol-tabs no-print">
+              <button type="button" id="tabCustomPlanner" class="protocol-tab-btn active" onclick="selectPlannerMode('custom')">
+                Custom Selection
+              </button>
+              <button type="button" id="tabRestoreCore" class="protocol-tab-btn restore-btn" onclick="applyRestoreCoreProtocol()">
+                &#9889; Restore the Core Protocol
+              </button>
+            </div>
+
+            <p style="font-size:14px; color:#475569; margin-bottom: 20px;">Select required products (or load the <strong>Restore the Core Protocol</strong> bundle, uncheck any unwanted brands, or add more) and enter your offered Customer Pricing to calculate costs.</p>
             
             <div class="table-responsive">
               <table id="plannerTable">
@@ -990,54 +1047,139 @@ END:VCALENDAR`;
     });
   }
 
+  let plannerCustomValues = {}; // stores { [idx]: { dose, price, checked } }
+
+  function saveCurrentPlannerInputs() {
+    selectedProductsList.forEach(idx => {
+      const doseEl = document.getElementById(`dose_${idx}`);
+      const priceEl = document.getElementById(`price_${idx}`);
+      const chkEl = document.getElementById(`chk_${idx}`);
+      if (doseEl || priceEl || chkEl) {
+        plannerCustomValues[idx] = {
+          dose: doseEl ? doseEl.value : products[idx].dosePer100,
+          price: priceEl ? priceEl.value : "",
+          checked: chkEl ? chkEl.checked : true
+        };
+      }
+    });
+  }
+
+  function selectPlannerMode(mode) {
+    const customBtn = document.getElementById('tabCustomPlanner');
+    const restoreBtn = document.getElementById('tabRestoreCore');
+    if (mode === 'restore') {
+      restoreBtn.classList.add('active');
+      customBtn.classList.remove('active');
+    } else {
+      customBtn.classList.add('active');
+      restoreBtn.classList.remove('active');
+    }
+  }
+
+  function applyRestoreCoreProtocol() {
+    saveCurrentPlannerInputs();
+    selectPlannerMode('restore');
+
+    // Core protocol brands: Germer, Vimeral Forte, Anabolite P, Groviplex, Lixen, Trox, Vitablend WM forte
+    const coreBrandPrefixes = [
+      "Germer",
+      "Vimeral Forte",
+      "Anabolite-P",
+      "Groviplex",
+      "Lixen",
+      "Trox",
+      "Vitablend WM Forte"
+    ];
+
+    coreBrandPrefixes.forEach(prefix => {
+      // Pick the primary/standard pack for each core brand (first matching entry in products list)
+      const idx = products.findIndex(p => p.name.toLowerCase().startsWith(prefix.toLowerCase()));
+      if (idx !== -1) {
+        const idxStr = idx.toString();
+        if (!selectedProductsList.includes(idxStr)) {
+          selectedProductsList.push(idxStr);
+        }
+        if (!plannerCustomValues[idxStr]) {
+          plannerCustomValues[idxStr] = {
+            dose: products[idx].dosePer100,
+            price: "",
+            checked: true
+          };
+        } else {
+          plannerCustomValues[idxStr].checked = true;
+        }
+      }
+    });
+
+    renderSelectedProducts();
+  }
+
   function addProductToPlanner() {
     const dropdown = document.getElementById('productDropdown');
     const idx = dropdown.value;
     
     if(idx === "") return;
+
+    saveCurrentPlannerInputs();
     
     if(selectedProductsList.includes(idx)) {
-        alert("This product is already added.");
+        // Re-check if it was unchecked
+        if (plannerCustomValues[idx]) plannerCustomValues[idx].checked = true;
+        renderSelectedProducts();
+        dropdown.value = "";
         return;
     }
 
     selectedProductsList.push(idx);
+    plannerCustomValues[idx] = {
+      dose: products[idx].dosePer100,
+      price: "",
+      checked: true
+    };
     renderSelectedProducts();
     dropdown.value = "";
   }
 
   function toggleProductSelection(idx) {
     const el = document.getElementById(`chk_${idx}`);
-    if(!el.checked) {
-        selectedProductsList = selectedProductsList.filter(i => i !== idx.toString());
-        renderSelectedProducts();
+    saveCurrentPlannerInputs();
+    if (plannerCustomValues[idx]) {
+      plannerCustomValues[idx].checked = el.checked;
+    }
+    const row = document.getElementById(`row_${idx}`);
+    if (row) {
+      row.style.opacity = el.checked ? '1' : '0.5';
     }
   }
 
   function renderSelectedProducts() {
     const tbody = document.getElementById('selectedProductsTbody');
     if(selectedProductsList.length === 0) {
-        tbody.innerHTML = `<tr id="emptyPlannerRow"><td colspan="4" style="text-align:center; padding:30px; color:#94a3b8; font-style:italic;">No products selected yet. Use the dropdown above to add products.</td></tr>`;
+        tbody.innerHTML = `<tr id="emptyPlannerRow"><td colspan="4" style="text-align:center; padding:30px; color:#94a3b8; font-style:italic;">No products selected yet. Click "Restore the Core Protocol" or use the dropdown above to add products.</td></tr>`;
         return;
     }
     
     tbody.innerHTML = '';
     selectedProductsList.forEach(idx => {
       const p = products[idx];
+      const saved = plannerCustomValues[idx] || { dose: p.dosePer100, price: "", checked: true };
+      const checkedAttr = saved.checked ? 'checked' : '';
+      const rowOpacity = saved.checked ? '1' : '0.5';
+
       tbody.innerHTML += `
-        <tr>
+        <tr id="row_${idx}" style="opacity: ${rowOpacity}; transition: opacity 0.2s;">
           <td class="col-select" style="text-align:center;">
-             <input type="checkbox" id="chk_${idx}" class="custom-checkbox prod-checkbox" value="${idx}" checked onclick="toggleProductSelection('${idx}')">
+             <input type="checkbox" id="chk_${idx}" class="custom-checkbox prod-checkbox" value="${idx}" ${checkedAttr} onclick="toggleProductSelection('${idx}')">
           </td>
           <td><b>${p.name}</b><br><small style="color:#64748b;">${p.group}</small></td>
           <td>
             <div style="display:flex; align-items:center; gap:8px;">
-                <input type="number" id="dose_${idx}" value="${p.dosePer100}" class="print-input" onchange="this.setAttribute('value', this.value)" style="width:70px; padding:6px; font-size:14px; min-height:30px;">
+                <input type="number" id="dose_${idx}" value="${saved.dose}" class="print-input" onchange="this.setAttribute('value', this.value)" style="width:70px; padding:6px; font-size:14px; min-height:30px;">
                 <span style="font-size:13px; color:#475569;">${p.unit}</span>
             </div>
           </td>
           <td>
-            <input type="number" id="price_${idx}" placeholder="Enter Price" class="print-input" onchange="this.setAttribute('value', this.value)" style="width:110px; padding:6px; font-size:14px; min-height:30px;">
+            <input type="number" id="price_${idx}" value="${saved.price}" placeholder="Enter Price" class="print-input" onchange="this.setAttribute('value', this.value)" style="width:110px; padding:6px; font-size:14px; min-height:30px;">
           </td>
         </tr>
       `;
